@@ -2,7 +2,7 @@
 
 class encryption {
 	load() {
-        $("head").append('<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.min.js"></script>');
+        	$("head").append('<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.min.js"></script>');
 	}
 
 	stop() {
