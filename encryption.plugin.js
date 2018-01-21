@@ -11,8 +11,6 @@ class encryption {
 
 	start() {
 
-		console.clear();
-
 		//  encryption / decryption password
 		window.shared_password = "CHANGE ME!";
 
