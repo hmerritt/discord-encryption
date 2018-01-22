@@ -21,7 +21,7 @@ class encryption {
 		    	color: #43b581 !important;
 		    }
 		    .not-decrypted {
-		    	color: red !important;
+		    	color: #FF2949 !important;
 		    }
 		  </style>
 		`);
@@ -90,7 +90,7 @@ class encryption {
 	}
 
   	getVersion() {
-		return '0.0.7';
+		return '0.6.8';
 	}
 
 	getDescription() {
