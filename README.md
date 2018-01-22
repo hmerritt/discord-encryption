@@ -5,8 +5,10 @@ An experimental encryption solution for Discord using [BetterDiscord](https://gi
 Adds ability to encrypt / decrypt messages on discord using a set password
  - Utilizes AES-256 encryption via the [stanford javascript crypto library](https://github.com/bitwiseshiftleft/sjcl)
  - Encrypted messages appear as green
+ - Messages that fail to be decrypted (most likely due to an incorrect password) display a message and appear as red
 
 ![Context](https://i.imgur.com/aKGUqEn.png) 
+![Context](https://i.imgur.com/WCjq3kV.png)
 
 ## How to use
 ### Install
