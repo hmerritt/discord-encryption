@@ -18,8 +18,11 @@ class encryption {
 		$("head").append(`
 		  <style type="text/css">
 		    .decrypted {
-			  color: #43b581 !important;
-			}
+		    	color: #43b581 !important;
+		    }
+		    .not-decrypted {
+		    	color: red !important;
+		    }
 		  </style>
 		`);
 
@@ -41,8 +44,13 @@ class encryption {
 
 			//  decrypt message using set password
 			function msg_dec(msg_enc) {
-			    return sjcl.decrypt(shared_password, msg_enc, {count: 2048, ks: 256});
-			}
+				try {
+					return sjcl.decrypt(shared_password, msg_enc, {count:2048, ks:256});
+				}
+				catch (error) {
+					return "<span class='not-decrypted'>Oh no! this message could not be decrypted</span>";
+				}
+            		}
 
 			//  decrypt all messages
 			function decrypt_all_msg() {
