@@ -48,7 +48,7 @@ class encryption {
 					return sjcl.decrypt(shared_password, msg_enc, {count:2048, ks:256});
 				}
 				catch (error) {
-					return "<span class='not-decrypted'>Oh no! this message could not be decrypted</span>";
+					return "<span class='not-decrypted'>Oh no! this message failed to be decrypted</span>";
 				}
             		}
 
