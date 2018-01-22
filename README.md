@@ -8,7 +8,7 @@ Adds ability to encrypt / decrypt messages on discord using a set password
  - Messages that fail to be decrypted (most likely due to an incorrect password) display a message and appear as red
 
 ![Context](https://i.imgur.com/aKGUqEn.png) 
-![Context](https://i.imgur.com/wTUbkPc.png)
+![Context](https://i.imgur.com/JxQiRGX.png)
 
 ## How to use
 ### Install
