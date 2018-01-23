@@ -18,13 +18,14 @@ Adds ability to encrypt / decrypt messages on discord using a set password
  
 ![Context](https://i.imgur.com/YZRCAo1.png)
 ### Usage
- - To encrypt a message simpily right click the textarea (the message) and the message will be replaced in its encrypted form
+ - To encrypt a message simpily click the added lock button in the message bar and the message will be replaced in its encrypted form
  - Receved messages are decrypted automatically
+ 
+![Context](https://i.imgur.com/Zumi9SZ.png)
  
 ## IMPORTANT
 This plugin is still in early development and noticeable bugs will most likely appear
- - Once a message is encrypted in the textarea you MUST press the space key before sending the message otherwise the unencrypted message will be sent
- - On right click Discord also opens a "paste" option alongside encrypting the message which makes for a less seamless experiance
+ - On start the lock button may not appear - to solve this just open another channel and reopen the desired chat and the button should reinitialize 
 
 ### Encrypted Message
 ![Context](https://i.imgur.com/s8CYNJK.png)
