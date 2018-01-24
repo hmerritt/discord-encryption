@@ -296,7 +296,7 @@ class encryption {
     }
 
     getVersion() {
-        return '1.2.1';
+        return '1.2.4';
     }
 
     getDescription() {
