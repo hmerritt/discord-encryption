@@ -26,6 +26,9 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 ## IMPORTANT
 This plugin is still in early development and noticeable bugs will most likely appear
  - On start the lock button may not appear - to solve this just open another channel and reopen the desired chat and the button should reinitialize 
+ 
+## TODO
+ - Add interface option to change encryption / decryption password in the app
 
 ### Encrypted Message
 ![Context](https://i.imgur.com/s8CYNJK.png)
