@@ -14,12 +14,14 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 ## How to use
 ### Install
  - Place 'enctyption.plugin.js' in BetterDiscord's plugin folder and then enable it in the settings
- - Open 'enctyption.plugin.js' and set your custom password (receiver of encrypted messages will also need this password). If this password is changed all previous encrypted messages will be lost.
+ - To set the encryption password open discord with the plugin enabled and an input box will appear for the password to be entered (can be changed / recovered by right-clicking the lock icon)
  
-![Context](https://i.imgur.com/YZRCAo1.png)
+![Context](https://i.imgur.com/H2Z7N7I.png)
+![Context](https://i.imgur.com/Ea0AdqO.png)
 ### Usage
  - To encrypt a message simpily click the added lock button in the message bar and the message will be replaced in its encrypted form
  - Receved messages are decrypted automatically
+ - To view or change the encryption password simply right-click the lock icon and an input box will appear - passwords are automatically saved as you type
  
 ![Context](https://i.imgur.com/Zumi9SZ.png)
  
