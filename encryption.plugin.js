@@ -26,6 +26,10 @@ class encryption {
         //  encryption / decryption password
         window.shared_password = load_password();
 		
+		if (shared_password == null || shared_password == undefined) {
+			shared_password = "";
+		}
+		
 		function encryption_input_toggle() {
 			if ($("#encryptionInput").length == 0) {
 				$('form').append(`
