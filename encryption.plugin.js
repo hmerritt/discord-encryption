@@ -192,11 +192,17 @@ class encryption {
                     msg_final = "--aes256-encrypted-message--" + String(msg_enc);
                 return msg_final;
             }
+			
+			//  detect URLs in plain text and replace with links
+			function replaceURLWithHTMLLinks(text) {
+				var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+				return text.replace(exp,"<a href='$1' target='_blank'>$1</a>"); 
+			}
 
             //  decrypt message using set password
             function msg_dec(msg_enc) {
 				try {
-					return sjcl.decrypt(shared_password, msg_enc, {count:2048, ks:256});
+					return replaceURLWithHTMLLinks(sjcl.decrypt(shared_password, msg_enc, {count:2048, ks:256}));
 				}
 				catch (error) {
 					return "<span class='not-decrypted'>Oh no! this message failed to be decrypted</span>";
