@@ -17,28 +17,29 @@ class encryption {
 
         console.clear();
 		
-		//  encryption / decryption password
-		window.shared_password = "";
-		
 		//  load password from local storage
 		function load_password() {
 			var localStorageEncryption = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
 			return localStorageEncryption["password"];
 		}
 		
+		//  encryption / decryption password
 		try {
-			shared_password = load_password();
+			window.shared_password = load_password();
 			if(shared_password == null || shared_password == undefined) throw "error";
 		}
 		catch (error) {
-			shared_password = "";
+			window.shared_password = "";
 		}
 		
-		//  make encrypted messages appear green
+		//  inject styles
 		$("head").append(`
 		  <style type="text/css">
 		    .decrypted {
 			  color: #43b581 !important;
+			}
+			.decrypted a {
+			  color: #1C9C6D !important;
 			}
 			.not-decrypted {
 			  color: #FF2949 !important;
