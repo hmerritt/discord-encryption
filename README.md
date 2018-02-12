@@ -13,7 +13,7 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 
 ## How to use
 ### Install
- - Place 'enctyption.plugin.js' in BetterDiscord's plugin folder and then enable it in the settings
+ - Place 'encryption.plugin.js' in BetterDiscord's plugin folder and then enable it in the settings
  - To set the encryption password open discord with the plugin enabled and an input box will appear for the password to be entered (can be changed / recovered by right-clicking the lock icon)
  
 ![Context](https://i.imgur.com/H2Z7N7I.png)
