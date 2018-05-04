@@ -305,7 +305,7 @@ class encryption {
                         } else {
                             if ($("textarea").val().substring(0, 28) == "--aes256-encrypted-message--") {
                                 var msg = $("textarea").val().substring(28),
-                                    textarea = document.querySelector(".channelTextArea-1HTP3C textarea"),
+                                    textarea = document.querySelector("textarea"),
                                     textareaInstance = BDfunctionsDevilBro.getOwnerInstance({
                                         "node": textarea,
                                         "name": "ChannelTextAreaForm",
@@ -316,7 +316,7 @@ class encryption {
                                 });
                             } else {
                                 var msg = $("textarea").val(),
-                                    textarea = document.querySelector(".channelTextArea-1HTP3C textarea"),
+                                    textarea = document.querySelector("textarea"),
                                     textareaInstance = BDfunctionsDevilBro.getOwnerInstance({
                                         "node": textarea,
                                         "name": "ChannelTextAreaForm",
@@ -340,7 +340,7 @@ class encryption {
             }
             add_encryption_button();
 
-            $(".guild, .channel, .containerDefault-7RImuF").click(function() {
+            $(".guild, .channel, .containerDefault-1ZnADq").click(function() {
                 encryption_input_toggle("hide");
                 setTimeout(function() {
                     add_encryption_button();
