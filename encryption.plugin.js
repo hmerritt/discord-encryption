@@ -4,9 +4,9 @@ class encryption {
 
         //  add crypto lib + some useful functions
         $("head").append(`
-      			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.min.js"></script>
-      			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
-		    `);
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.min.js"></script>
+			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
+		`);
 
     }
 
@@ -15,20 +15,35 @@ class encryption {
     start() {
 
         console.clear();
+		
+		this.attachHandler();
 
         //  load password from local storage
         function load_password() {
             var localStorageEncryption = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
             return localStorageEncryption["password"];
         }
+		
+        function load_encryptionState() {
+            var localStorageEncryption = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
+            return localStorageEncryption["state"];
+        }
 
-        //  set encryption / decryption password
+        //  set encryption / decryption password and state
         try {
             window.shared_password = load_password();
             if (shared_password == null || shared_password == undefined) throw "error";
         } catch (error) {
             window.shared_password = "";
         }
+		
+		
+		//  load encryption state
+		window.encryptionState = load_encryptionState();
+		if (shared_password == null || shared_password == undefined) encryptionState = 'off';
+		
+
+        window.loops = 0;
 
         //  inject styles
         $("head").append(`
@@ -58,6 +73,22 @@ class encryption {
       			.encryptionButton:hover path {
       			  fill: #fff;
       			}
+				
+      			.encryptionButton[state=on] path {
+      			  fill: #43b581;
+      			}
+      			.encryptionButton[state=off] path {
+      			  fill: #888;
+      			}
+				
+      			.encryptionButton[state=on]:hover path {
+      			  fill: #1C9C6D;
+      			}
+      			.encryptionButton[state=off]:hover path {
+      			  fill: #fff;
+      			}
+				
+				
       			#encryptionInput {
       			  position: absolute;
       			  top: -10px;
@@ -177,7 +208,6 @@ class encryption {
         if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('chat') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('markup') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('message') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('message-sending') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('hide-overflow') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-wrapper')) {
 
@@ -229,54 +259,54 @@ class encryption {
 
             //  toggle input for encryption password change
             function encryption_input_toggle(toggle) {
-                if (toggle == "show" || toggle == "" && $("#encryptionInput").length == 0) {
+                if (toggle == "show" || toggle == "" && $('#encryptionInput').length == 0) {
                     if ($("#encryptionInput").length == 0) {
                         $('form').append(`
-              							<div id="encryptionInput" class="encryptionInput animated fadeInUp">
-              								<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-              									<path fill="#ddd" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
-              								</svg>
-              								<input placeholder="Encryption password" type="password">
-              								<script>
-              									$("#encryptionInput input").val(shared_password);
+							<div id="encryptionInput" class="encryptionInput animated fadeInUp">
+								<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+									<path fill="#ddd" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
+								</svg>
+								<input placeholder="Encryption password" type="password">
+								<script>
+									$("#encryptionInput input").val(shared_password);
 
-              									//  save password to local storage
-              									function save_password(password) {
-              										var objPassword = {"password": password};
-              										localStorage.discordEncryption = JSON.stringify(objPassword);
-              										shared_password = password;
-              									}
-              									//  load password from local storage
-              									function load_password() {
-              										var localStorageEncryption = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
-              										return localStorageEncryption["password"];
-              									}
+									//  save password to local storage
+									function save_password(password) {
+										var objPassword = {"password": password, "state": encryptionState};
+										localStorage.discordEncryption = JSON.stringify(objPassword);
+										shared_password = password;
+									}
+									//  load password from local storage
+									function load_password() {
+										var localStorageEncryption = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
+										return localStorageEncryption["password"];
+									}
 
-              									function encrtption_password_check() {
-              										if ($("#encryptionInput input").val().length < 3) {
-              											$("#encryptionInput").removeClass("nice-password");
-              										} else {
-              											$("#encryptionInput").addClass("nice-password");
-              											save_password($("#encryptionInput input").val());
-              										}
-              									}
-              									encrtption_password_check();
-              									$("#encryptionInput input").keyup(function() {
-              										encrtption_password_check();
-              									});
+									function encrtption_password_check() {
+										if ($("#encryptionInput input").val().length < 3) {
+											$("#encryptionInput").removeClass("nice-password");
+										} else {
+											$("#encryptionInput").addClass("nice-password");
+											save_password($("#encryptionInput input").val());
+										}
+									}
+									encrtption_password_check();
+									$("#encryptionInput input").keyup(function() {
+										encrtption_password_check();
+									});
 
-              									$("#encryptionInput svg").click(function() {
-              										if ($("#encryptionInput input").attr("type") == "password") {
-              												$("#encryptionInput input").attr("type", "text");
-              												$("#encryptionInput svg path").attr("d", "M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z");
-              										} else {
-              											$("#encryptionInput input").attr("type", "password");
-              											$("#encryptionInput svg path").attr("d", "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z");
-              										}
-              									});
-              								</script>
-              							</div>
-          					    `);
+									$("#encryptionInput svg").click(function() {
+										if ($("#encryptionInput input").attr("type") == "password") {
+												$("#encryptionInput input").attr("type", "text");
+												$("#encryptionInput svg path").attr("d", "M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z");
+										} else {
+											$("#encryptionInput input").attr("type", "password");
+											$("#encryptionInput svg path").attr("d", "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z");
+										}
+									});
+								</script>
+							</div>
+						`);
                     }
                 } else {
                     $("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
@@ -290,44 +320,40 @@ class encryption {
             function add_encryption_button() {
                 if (document.getElementById("encryptionButton") == null || document.getElementById("encryptionButton") == undefined) {
                     $('svg[class*=attachButton]').after(`
-            						<svg id="encryptionButton" class="encryptionButton" style="width:24px;height:24px" viewBox="0 0 24 24">
-            							<path fill="#888" d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
-            						</svg>
+						<svg id="encryptionButton" class="encryptionButton" state="${encryptionState}" style="width:24px;height:24px" viewBox="0 0 24 24">
+							<path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
+						</svg>
+						
+						<script type='text/javascript'>
+						
+							//  toggle encryption state
+							if (encryptionState == 'on') {
+								$(".encryptionButton").attr('state', 'on').find('path').attr('fill', '#43b581');
+							} else {
+								$(".encryptionButton").attr('state', 'off').find('path').attr('fill', '#888');
+							}
+						
+							$(".encryptionButton").click(function() {
+						
+								//  toggle encryption state
+								if (encryptionState == 'on') {
+									encryptionState = 'off';
+									$(this).attr('state', 'off').find('path').attr('fill', '#888');
+								} else {
+									encryptionState = 'on';
+									$(this).attr('state', 'on').find('path').attr('fill', '#43b581');
+								}
+								
+								try {
+									var storageObj = {"password": shared_password, "state": encryptionState};
+									localStorage.discordEncryption = JSON.stringify(storageObj);
+								} catch (err) {
+									console.error('[Encrption] Error in changing encrption state ('+err+')');
+								}
+						
+							});
+						</script>
                     `);
-
-                    $(".encryptionButton").click(function() {
-                        if ($("textarea").val().length < 1) {
-                          if ($("#encryptionInput").length < 1) {
-                              encryption_input_toggle("show");
-                          } else {
-                              encryption_input_toggle("hide");
-                          }
-                        } else {
-                            if ($("textarea").val().substring(0, 28) == "--aes256-encrypted-message--") {
-                                var msg = $("textarea").val().substring(28),
-                                    textarea = document.querySelector("textarea"),
-                                    textareaInstance = BDfunctionsDevilBro.getOwnerInstance({
-                                        "node": textarea,
-                                        "name": "ChannelTextAreaForm",
-                                        "up": true
-                                    });
-                                textareaInstance.setState({
-                                    textValue: msg_dec(msg)
-                                });
-                            } else {
-                                var msg = $("textarea").val(),
-                                    textarea = document.querySelector("textarea"),
-                                    textareaInstance = BDfunctionsDevilBro.getOwnerInstance({
-                                        "node": textarea,
-                                        "name": "ChannelTextAreaForm",
-                                        "up": true
-                                    });
-                                textareaInstance.setState({
-                                    textValue: msg_enc(msg)
-                                });
-                            }
-                        }
-                    });
 
                     if (shared_password.length < 3) {
                         encryption_input_toggle("show");
@@ -336,9 +362,11 @@ class encryption {
                         e.preventDefault();
                         encryption_input_toggle("");
                     });
+					
                 }
             }
             add_encryption_button();
+			
 
             $(".guild, .channel, .containerDefault-1ZnADq").click(function() {
                 encryption_input_toggle("hide");
@@ -347,8 +375,107 @@ class encryption {
                 }, 88);
             });
 
+
+            function sleep(delay) {
+                var start = new Date().getTime();
+                while (new Date().getTime() < start + delay);
+            }
+
         }
     }
+	
+
+    //  add handler for sending message
+    attachHandler() {
+		
+		var el = $('form textarea');
+		
+		//  get auth token
+		if (bdStorage.get('token') == '') {
+            var DiscordLocalStorageProxy = document.createElement('iframe');
+            DiscordLocalStorageProxy.style.display = 'none';
+            DiscordLocalStorageProxy.id = 'DiscordLocalStorageProxy';
+            document.body.appendChild(DiscordLocalStorageProxy);
+            var token = DiscordLocalStorageProxy.contentWindow.localStorage.token.replace(/"/g, "");
+            bdStorage.set('token',token);
+            //  delete DiscordLocalStorageProxy;
+        }
+		
+		var token = bdStorage.get('token');
+		
+		function sendEmbed(msg) {
+			var channelID = window.location.pathname.split('/').pop();
+			var data = JSON.stringify({content : msg});
+			
+			$.ajax({
+				type : "POST",
+				url : "https://discordapp.com/api/channels/" + channelID + "/messages",
+				headers : {
+					//  "authorization": localStorage.token.slice(1, -1)
+					"authorization": token
+				},
+				dataType : "json",
+				contentType : "application/json",
+				data: data,
+				error: (req, error, exception) => {
+					console.log(req.responseText);
+				}
+			});
+		
+		}
+		
+		
+		//  encrypt message using set password - add an encryption prefix for identification
+		function msg_enc(msg_original) {
+			var msg_enc = sjcl.encrypt(shared_password, msg_original, {
+					count: 2048,
+					ks: 256
+				}),
+				msg_final = "--aes256-encrypted-message--" + String(msg_enc);
+			return msg_final;
+		}
+		
+
+        //  encrypt message automatically on enter
+        this.handleKeypress = function (e) {
+            if (e.which == 13) {
+				
+                if (encryptionState == 'on' &&
+				    $("form textarea").val().substring(0, 28) !== "--aes256-encrypted-message--" &&
+				    $("form textarea").val().length > 0) {
+						
+					e.preventDefault();
+					e.stopPropagation();
+
+                    var msg = $("textarea").val();
+					sendEmbed(msg_enc(msg));
+					
+					$("form textarea").val('');
+					var textareaInstance = BDfunctionsDevilBro.getOwnerInstance({
+							"node": el[0],
+							"name": "ChannelTextAreaForm",
+							"up": true
+						});
+					textareaInstance.setState({
+						textValue: ''
+					});
+                }
+				
+            }
+        };
+		
+		//  bind keypress event
+		el[0].addEventListener("keydown", this.handleKeypress, false);
+
+    }
+	
+	
+	onSwitch() {
+		this.attachHandler();
+	}
+	
+	
+
 
     getName() {
         return 'Encryption';
@@ -359,7 +486,7 @@ class encryption {
     }
 
     getVersion() {
-        return '1.3.0';
+        return '1.5.0';
     }
 
     getDescription() {
