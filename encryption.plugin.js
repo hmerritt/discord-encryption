@@ -8,7 +8,7 @@ class encryption {
 
         //  add crypto lib + some useful functions
         $("head").append(`
-      			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.min.js"></script>
+      			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
       			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
 		    `);
 
@@ -28,7 +28,7 @@ class encryption {
     start() {
 
 
-        console.clear();
+//        console.clear();
         this.attachHandler();
 
 
@@ -235,8 +235,8 @@ class encryption {
                 document.getElementById('encryptionButton') == undefined) {
 
                 //  add button to html
-                $('svg[class*=attachButton]').after(`
-                    <svg id="encryptionButton" class="encryptionButton" state="${encryptionState}" style="width:24px;height:24px" viewBox="0 0 24 24">
+                $('button.da-attachButton').after(`
+                    <svg id="encryptionButton" class="encryptionButton" state="${encryptionState}" style="width:24px;height:24px;padding-right:8px;" viewBox="0 0 24 24">
                       <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
                     </svg>
 
