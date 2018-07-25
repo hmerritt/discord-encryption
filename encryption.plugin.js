@@ -348,14 +348,50 @@ class encryption {
 
 
 
+        //  decrypt messages already on screen at start
+        addButton();
+        //  decrypt message using set password
+        function decrypt(message) {
+            try {
+                return restoreLinks(sjcl.decrypt(password, message, {
+                    count: 2048,
+                    ks: 256
+                }));
+            } catch (error) {
+                return '<span class="not-decrypted">Oh no! this message failed to be decrypted</span>';
+            }
+        }
+        //  detect URLs in plain text and replace with links
+        function restoreLinks(text) {
+            var link = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            return text.replace(link, '<a href="$1" target="_blank">$1</a>');
+        }
+        //  decrypt all messages
+        function decryptAll() {
+            //  loop messages
+            $('.da-markup').each(function() {
+                var message = $(this).text().trim();
+                //  separate id from message
+                if (message.substring(0, 28) == '--aes256-encrypted-message--') {
+                    //  decrypt messages and add them into ui
+                    var encrypted = message.substring(28, message.lastIndexOf('}') + 1);
+                    $(this).html(decrypt(encrypted)).addClass('decrypted');
+                }
+            });
+        }
+        //  decrypt all messages
+        decryptAll();
+
+
+
     }
 
 
     observer({addedNodes}) {
 
         if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('chat') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('markup') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('message') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-markup') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-message') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('hide-overflow') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-wrapper')) {
 
@@ -382,7 +418,7 @@ class encryption {
                 //  decrypt all messages
                 function decryptAll() {
                     //  loop messages
-                    $('.markup').each(function() {
+                    $('.da-markup').each(function() {
                         var message = $(this).text().trim();
                         //  separate id from message
                         if (message.substring(0, 28) == '--aes256-encrypted-message--') {

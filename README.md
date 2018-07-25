@@ -1,5 +1,5 @@
 # Discord Encryption
-An experimental encryption solution for Discord using [BetterDiscord](https://github.com/jiiks/betterdiscordapp)
+An experimental encryption solution for Discord using [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp/releases)
 
 ## Features
 Adds ability to encrypt / decrypt messages on discord using a set password
