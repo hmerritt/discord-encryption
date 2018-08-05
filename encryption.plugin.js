@@ -217,6 +217,7 @@ class encryption {
           if (channel.state == 'on') {
               setCryptState(channel, 'off');
           } else {
+              checkPassword();
               setCryptState(channel, 'on');
           }
         }
