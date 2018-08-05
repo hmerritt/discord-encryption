@@ -7,7 +7,7 @@ class encryption {
         $("head").append(`
       			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
       			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
-            <script type="text/javascript" src="https://raw.githubusercontent.com/blueimp/JavaScript-MD5/master/js/md5.min.js"></script>
+            <script type="text/javascript" src="https://raw.githubusercontent.com/blueimp/JavaScript-MD5/master/js/md5.js"></script>
 		    `);
 
         //  load local storage
@@ -25,7 +25,7 @@ class encryption {
         //  if any errors - set to nothing
             //  get password from storage
         window.get_password = function(channel_id=window.location.pathname.split('/').pop()) {
-              return (encryptionStorage[channel_id]) ? encryptionStorage[channel_id]['password'] : '';
+              return (encryptionStorage[channel_id]['password']) ? encryptionStorage[channel_id]['password'] : '';
         }
 
         //  inject styles
