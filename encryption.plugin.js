@@ -25,7 +25,7 @@ class encryption {
         //  if any errors - set to nothing
             //  get password from storage
         window.get_password = function(channel_id=window.location.pathname.split('/').pop()) {
-              return (channel_id) ? encryptionStorage[channel_id]['password'] : '';
+              return (encryptionStorage[channel_id]) ? encryptionStorage[channel_id]['password'] : '';
         }
 
         //  inject styles
