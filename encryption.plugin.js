@@ -1,63 +1,42 @@
 //META{"name":"encryption"}*//
 class encryption {
 
-
-
     load() {
-
-
         //  add crypto lib + some useful functions
         $("head").append(`
       			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
       			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
 		    `);
 
-
         //  load local storage
         window.encryptionStorage = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
-
-
     }
-
-
 
     stop() {}
 
-
-
     start() {
-
-
 //        console.clear();
         this.attachHandler();
-
 
         //  get encryption password
         //  if any errors - set to nothing
         try {
-
             //  get password from storage
             window.password = encryptionStorage['password'];
 
             //  if empty - throw an error
             if (password == null || password == undefined) throw 'Password is empty';
-
         } catch (error) {
-
             //  set password to nothing
             window.password = '';
 
             //  log any errors
             console.error('[Encryption] Error retrieving password (' + error + ')');
-
         }
-
         //  get encryption state
         //  if empty - set to off
         window.encryptionState = encryptionStorage['state'];
     		if (encryptionState == null || encryptionState == undefined) encryptionState = 'off';
-
-
 
         //  inject styles
         $('head').append(`
@@ -215,8 +194,6 @@ class encryption {
             </style>
         `);
 
-
-
         //  icon
 
         function setButtonState() {
@@ -227,7 +204,6 @@ class encryption {
                 $('.encryptionButton').attr('state', 'off').find('path').attr('fill', '#888');
             }
         }
-
 
         //  add encryption button - click to encrypt / decrypt message
         function addButton() {
@@ -282,7 +258,6 @@ class encryption {
                 }, 288);
             }
         }
-
 
         $(document).on('click', '.guild, .channel, .containerDefault-1ZnADq', function() {
             toggleInput('hide');
@@ -346,8 +321,6 @@ class encryption {
 
         });
 
-
-
         //  decrypt messages already on screen at start
         addButton();
         //  decrypt message using set password
@@ -381,21 +354,14 @@ class encryption {
         }
         //  decrypt all messages
         decryptAll();
-
-
-
     }
 
-
     observer({addedNodes}) {
-
         if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('chat') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-markup') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-message') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('hide-overflow') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-wrapper')) {
-
-
                 //  decrypt message using set password
                 function decrypt(message) {
                     try {
@@ -414,7 +380,6 @@ class encryption {
                     return text.replace(link, '<a href="$1" target="_blank">$1</a>');
                 }
 
-
                 //  decrypt all messages
                 function decryptAll() {
                     //  loop messages
@@ -431,22 +396,15 @@ class encryption {
 
                 //  decrypt all messages
                 decryptAll();
-
-
             }
-
     }
-
 
     onSwitch() {
   	     this.attachHandler();
   	}
 
-
-
     //  add handler for sending message
     attachHandler() {
-
         //  encrypt message using set password
         //  add an encryption prefix for identification
         function encrypt(message) {
@@ -494,7 +452,6 @@ class encryption {
 
     		}
 
-
         //  encrypt message automatically on enter
         this.handleKeypress = function (e) {
             if (e.which == 13) {
@@ -532,8 +489,6 @@ class encryption {
 
     }
 
-
-
     getName() {
         return 'Encryption';
     }
@@ -549,7 +504,4 @@ class encryption {
     getDescription() {
         return 'aes-256 encryption';
     }
-
-
-
 };
