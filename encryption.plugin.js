@@ -5,9 +5,9 @@ class encryption {
         //  add crypto lib + some useful functions
         console.log('Loading encryption..')
         $("head").append(`
+            <script type="text/javascript" src="https://raw.githubusercontent.com/blueimp/JavaScript-MD5/master/js/md5.js"></script>
       			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
       			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
-            <script type="text/javascript" src="https://raw.githubusercontent.com/blueimp/JavaScript-MD5/master/js/md5.js"></script>
 		    `);
 
         //  load local storage
@@ -25,7 +25,8 @@ class encryption {
         //  if any errors - set to nothing
             //  get password from storage
         window.get_password = function(channel_id=window.location.pathname.split('/').pop()) {
-              return (encryptionStorage[channel_id]['password']) ? encryptionStorage[channel_id]['password'] : '';
+              return (encryptionStorage[channel_id]) ? 
+                      (encryptionStorage[channel_id]['password']) ? encryptionStorage[channel_id]['password'] : '' : ''
         }
 
         //  inject styles
@@ -189,7 +190,7 @@ class encryption {
 
         window.is_encrypted = function(channel_id=window.location.pathname.split('/').pop()) {
           var channel = encryptionStorage[channel_id]
-          return (channel.state == 'on') ? true : false
+          return (channel) ? (channel.state == 'on') ? true : false : false
         }
 
 
@@ -248,7 +249,7 @@ class encryption {
               setButtonState(encryptionState());
 
               //  if Encryption password is empty - show input
-              if (get_password().length < 3) {
+              if (get_password().length < 3 && is_encrypted()) {
                   toggleInput('show');
               }
         }
@@ -334,7 +335,8 @@ class encryption {
             // todo: check password before saving
             checkPassword();
             //  todo: use md5()
-            channel.password = md5($(this).val());
+            //channel.password = md5($(this).val());
+            channel.password = $(this).val();
             localStorageSave(encryptionStorage);
         });
 
