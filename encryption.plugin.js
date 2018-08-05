@@ -22,18 +22,9 @@ class encryption {
         console.log('Encryption started');
         //  get encryption password
         //  if any errors - set to nothing
-        try {
             //  get password from storage
-            window.password = encryptionStorage['password'];
-
-            //  if empty - throw an error
-            if (password == null || password == undefined) throw 'Password is empty';
-        } catch (error) {
-            //  set password to nothing
-            window.password = '';
-
-            //  log any errors
-            console.error('[Encryption] Error retrieving password (' + error + ')');
+        window.get_password = function(channel_id=window.location.pathname.split('/').pop()) {
+              return (channel_id) ? encryptionStorage[channel_id]['password'] : '';
         }
 
         //  inject styles
@@ -194,68 +185,82 @@ class encryption {
 
         //  get encryption state
         //  if empty - set to off
-        window.encryptionState = encryptionStorage['state'];
-    		if (encryptionState == null || encryptionState == undefined) encryptionState = 'off';
-        console.log('Encryption state: ' + encryptionState);
+
+        window.is_encrypted = function(channel_id=window.location.pathname.split('/').pop()) {
+          var channel = encryptionStorage[channel_id]
+          return (channel.state == 'on') ? true : false
+        }
+
+
+        function encryptionState(channel_id=window.location.pathname.split('/').pop()) {
+
+          return (encryptionStorage[channel_id]) ? encryptionStorage[channel_id].state : 'off'
+        }
+        console.log('Encryption state: ' + encryptionState());
 
         //  icon
-        function setCryptState(state) {
-          // todo: use true/false   
-          var stored_state = encryptionStorage['state']
-          if (state != stored_state) {
-              encryptionStorage['state'] = state;
+        function setCryptState(channel, state) {
+          // todo: use a reference?
+          if (state != channel.state) {
+              encryptionStorage[channel.id]['state'] = state;
               localStorageSave(encryptionStorage);
-              encryptionState=state;
               setButtonState(state);
           }
-          //return (state == 'on') && true || false
+          // todo: use true/false   
+          //return (state == 'on') ? true : false
         }
 
-        function toggleCryptState(state=encryptionState) {
-          if (state == 'on') {
-              setCryptState('off');
+        function toggleCryptState(channel_id=window.location.pathname.split('/').pop()) {
+          var channel = encryptionStorage[channel_id]
+          if (channel.state == 'on') {
+              setCryptState(channel, 'off');
           } else {
-              setCryptState('on');
+              setCryptState(channel, 'on');
           }
         }
 
-        function setButtonState(state=encryptionState) {
+        function setButtonState(state) {
             var state_color = { 'on': '43b581', 'off': '888' };
+            var color = (state_color[state]) ? state_color[state] : '888';
             console.log('setting encryption button state to ' + state);
-            $('.encryptionButton').attr('state', state).find('path').attr('fill', '#' + state_color[state]);
+            $('.encryptionButton').attr('state', state).find('path').attr('fill', '#' + color);
         }
 
-        //  add encryption button - click to encrypt / decrypt message
         function addButton() {
-            if (document.getElementById('encryptionButton') == null ||
-                document.getElementById('encryptionButton') == undefined) {
+              //  add encryption button - click to encrypt / decrypt message
+              $('button.da-attachButton').after(`
+                  <svg id="encryptionButton" class="encryptionButton" state=encryptionState() style="width:24px;height:24px;padding-right:8px;" viewBox="0 0 24 24">
+                    <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
+                  </svg>
 
-                //  add button to html
-                $('button.da-attachButton').after(`
-                    <svg id="encryptionButton" class="encryptionButton" state="${encryptionState}" style="width:24px;height:24px;padding-right:8px;" viewBox="0 0 24 24">
-                      <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
-                    </svg>
+                  <script type='text/javascript'>
+                      //  save password to local storage
+                      window.localStorageSave = function() {
+                          try {
+                              localStorage.discordEncryption = JSON.stringify(encryptionStorage);
+                          } catch (error) {
+                              console.error('[Encryption] Error saving to local storage (' + error + ')');
+                          }
+                      }
+                  </script>
+              `);
+              setButtonState(encryptionState());
 
-                    <script type='text/javascript'>
-                        //  save password to local storage
-                        window.localStorageSave = function(encryptionStorage) {
-                            try {
-                                localStorage.discordEncryption = JSON.stringify(encryptionStorage);
-                            } catch (error) {
-                                console.error('[Encryption] Error saving to local storage (' + error + ')');
-                            }
-                        }
-                    </script>
-                `);
+              //  if Encryption password is empty - show input
+              if (get_password().length < 3) {
+                  toggleInput('show');
+              }
+        }
 
-                setButtonState();
-
-                //  if Encryption password is empty - show input
-                if (password.length < 3) {
-                    toggleInput('show');
-                }
-
-            }
+        function initChannel(channel_id=window.location.pathname.split('/').pop()) {
+            // initialize storage element for this channel
+            encryptionStorage[channel_id] = (encryptionStorage[channel_id]) ? encryptionStorage[channel_id] : {'id': channel_id, 'state': 'off'}
+            setTimeout(function() {
+              if (document.getElementById('encryptionButton') == null ||
+                  document.getElementById('encryptionButton') == undefined) {
+                    addButton();
+              }
+            }, 88);
         }
 
         //  toggle input for encryption password change
@@ -281,9 +286,8 @@ class encryption {
 
         $(document).on('click', '.guild, .channel, .containerDefault-1ZnADq', function() {
             toggleInput('hide');
-            setTimeout(function() {
-                addButton();
-            }, 88);
+            initChannel();
+            is_encrypted() && decryptAll();
         });
 
         function checkPassword() {
@@ -311,7 +315,7 @@ class encryption {
         $(document).on('contextmenu', '.encryptionButton', function(e) {
             e.preventDefault();
             toggleInput('');
-            $('#encryptionInput input').val(password);
+            $('#encryptionInput input').val(get_password());
             checkPassword();
         });
 
@@ -325,11 +329,12 @@ class encryption {
         //  catch enters as well? change from key-up to loses focus?
         $(document).on('keyup', '#encryptionInput input', function() {
             //  set password and save in storage
-            password = $(this).val();
-            encryptionStorage['password'] = password;
+        		var channel = encryptionStorage[window.location.pathname.split('/').pop()];
             // todo: check password before saving
-            localStorageSave(encryptionStorage);
             checkPassword();
+            //  todo: use md5()
+            channel.password = $(this).val();
+            localStorageSave(encryptionStorage);
         });
 
         //  decrypt messages already on screen at start
@@ -337,7 +342,7 @@ class encryption {
         //  decrypt message using set password
         function decrypt(message) {
             try {
-                return restoreLinks(sjcl.decrypt(password, message, {
+                return restoreLinks(sjcl.decrypt(get_password(), message, {
                     count: 2048,
                     ks: 256
                 }));
@@ -376,7 +381,7 @@ class encryption {
                 //  decrypt message using set password
                 function decrypt(message) {
                     try {
-                        return restoreLinks(sjcl.decrypt(password, message, {
+                        return restoreLinks(sjcl.decrypt(get_password(), message, {
                             count: 2048,
                             ks: 256
                         }));
@@ -411,7 +416,6 @@ class encryption {
     }
 
     onSwitch() {
-         // should we short circuit in the handler based off encryptionState and call it direcly?
   	     this.attachHandler();
   	}
 
@@ -420,7 +424,7 @@ class encryption {
         //  encrypt message using set password
         //  add an encryption prefix for identification
         function encrypt(message) {
-            var encrypted = sjcl.encrypt(password, message, {
+            var encrypted = sjcl.encrypt(get_password(), message, {
                 count: 2048,
                 ks: 256
             });
@@ -444,13 +448,14 @@ class encryption {
     		function sendMessage(message) {
 
             //  create message payload
-        		var channelID = window.location.pathname.split('/').pop();
+        		var channel_id = window.location.pathname.split('/').pop();
+            console.log('sending message to ' + channel_id)
         		var data = JSON.stringify({content : message});
 
             //  send message
         		$.ajax({
         			type : 'POST',
-        			url : 'https://discordapp.com/api/channels/' + channelID + '/messages',
+        			url : 'https://discordapp.com/api/channels/' + channel_id + '/messages',
         			headers : {
         				'authorization': token
         			},
@@ -467,7 +472,7 @@ class encryption {
         //  encrypt message automatically on enter
         this.handleKeypress = function (e) {
             if (e.which == 13) {
-                if (encryptionState == 'on' &&
+                if (is_encrypted() &&
         				    $('form textarea').val().substring(0, 28) !== '--aes256-encrypted-message--' &&
         				    $('form textarea').val().length > 0) {
 
