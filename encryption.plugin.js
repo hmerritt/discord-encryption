@@ -3,6 +3,7 @@ class encryption {
 
     load() {
         //  add crypto lib + some useful functions
+        console.log('Loading encryption..')
         $("head").append(`
       			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
       			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
@@ -10,6 +11,7 @@ class encryption {
 
         //  load local storage
         window.encryptionStorage = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
+        console.log('Loaded')
     }
 
     stop() {}
@@ -17,7 +19,7 @@ class encryption {
     start() {
 //        console.clear();
         this.attachHandler();
-
+        console.log('Encryption started');
         //  get encryption password
         //  if any errors - set to nothing
         try {
@@ -33,10 +35,6 @@ class encryption {
             //  log any errors
             console.error('[Encryption] Error retrieving password (' + error + ')');
         }
-        //  get encryption state
-        //  if empty - set to off
-        window.encryptionState = encryptionStorage['state'];
-    		if (encryptionState == null || encryptionState == undefined) encryptionState = 'off';
 
         //  inject styles
         $('head').append(`
@@ -194,15 +192,37 @@ class encryption {
             </style>
         `);
 
-        //  icon
+        //  get encryption state
+        //  if empty - set to off
+        window.encryptionState = encryptionStorage['state'];
+    		if (encryptionState == null || encryptionState == undefined) encryptionState = 'off';
+        console.log('Encryption state: ' + encryptionState);
 
-        function setButtonState() {
-            //  toggle encryption state
-            if (encryptionState == 'on') {
-                $('.encryptionButton').attr('state', 'on').find('path').attr('fill', '#43b581');
-            } else {
-                $('.encryptionButton').attr('state', 'off').find('path').attr('fill', '#888');
-            }
+        //  icon
+        function setCryptState(state) {
+          // todo: use true/false   
+          var stored_state = encryptionStorage['state']
+          if (state != stored_state) {
+              encryptionStorage['state'] = state;
+              localStorageSave(encryptionStorage);
+              encryptionState=state;
+              setButtonState(state);
+          }
+          //return (state == 'on') && true || false
+        }
+
+        function toggleCryptState(state=encryptionState) {
+          if (state == 'on') {
+              setCryptState('off');
+          } else {
+              setCryptState('on');
+          }
+        }
+
+        function setButtonState(state=encryptionState) {
+            var state_color = { 'on': '43b581', 'off': '888' };
+            console.log('setting encryption button state to ' + state);
+            $('.encryptionButton').attr('state', state).find('path').attr('fill', '#' + state_color[state]);
         }
 
         //  add encryption button - click to encrypt / decrypt message
@@ -297,28 +317,19 @@ class encryption {
 
         //  change encryption state
         $(document).on('click', '.encryptionButton', function() {
-            if (encryptionState == 'on') {
-                encryptionState = 'off';
-                encryptionStorage['state'] = 'off';
-                localStorageSave(encryptionStorage);
-                $('.encryptionButton').attr('state', 'off').find('path').attr('fill', '#888');
-            } else {
-                encryptionState = 'on';
-                encryptionStorage['state'] = 'on';
-                localStorageSave(encryptionStorage);
-                $('.encryptionButton').attr('state', 'on').find('path').attr('fill', '#43b581');
-            }
+            console.log('toggling state..');
+            toggleCryptState();
         });
 
         //  change password on typing
+        //  catch enters as well? change from key-up to loses focus?
         $(document).on('keyup', '#encryptionInput input', function() {
-
             //  set password and save in storage
             password = $(this).val();
             encryptionStorage['password'] = password;
+            // todo: check password before saving
             localStorageSave(encryptionStorage);
             checkPassword();
-
         });
 
         //  decrypt messages already on screen at start
@@ -400,6 +411,7 @@ class encryption {
     }
 
     onSwitch() {
+         // should we short circuit in the handler based off encryptionState and call it direcly?
   	     this.attachHandler();
   	}
 
@@ -455,7 +467,6 @@ class encryption {
         //  encrypt message automatically on enter
         this.handleKeypress = function (e) {
             if (e.which == 13) {
-
                 if (encryptionState == 'on' &&
         				    $('form textarea').val().substring(0, 28) !== '--aes256-encrypted-message--' &&
         				    $('form textarea').val().length > 0) {
