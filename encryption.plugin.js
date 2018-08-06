@@ -215,9 +215,13 @@ class encryption {
         function toggleCryptState(channel_id=window.location.pathname.split('/').pop()) {
           var channel = encryptionStorage[channel_id]
           if (channel.state == 'on') {
+              toggleInput();
               setCryptState(channel, 'off');
           } else {
-              checkPassword();
+              if (get_password().length < 3) {
+                toggleInput('show');
+                checkPassword();
+              }
               setCryptState(channel, 'on');
           }
         }
@@ -267,6 +271,7 @@ class encryption {
         }
 
         //  toggle input for encryption password change
+        //  todo: make this actually toggle (not take input but flip state)
         function toggleInput(action) {
             if (action == 'show' ||
                 action == '' &&
@@ -287,7 +292,8 @@ class encryption {
             }
         }
 
-        $(document).on('click', '.guild, .channel, .containerDefault-1ZnADq', function() {
+        $(document).on('click', "[class^='guild'], .channel, .containerDefault-1ZnADq", function() {
+            console.log('click detected');
             toggleInput('hide');
             initChannel();
             is_encrypted() && decryptAll();
