@@ -5,7 +5,7 @@ class encryption {
         //  add crypto lib + some useful functions
         console.log('Loading encryption..')
         $("head").append(`
-            <script type="text/javascript" src="https://raw.githubusercontent.com/blueimp/JavaScript-MD5/master/js/md5.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jshashes/1.0.7/hashes.min.js"></script>
       			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
       			<script type="text/javascript" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDfunctionsDevilBro.js"></script>
 		    `);
@@ -13,6 +13,7 @@ class encryption {
         //  load local storage
         window.encryptionStorage = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
         console.log('Loaded')
+        window.md5 = new Hashes.MD5
     }
 
     stop() {}
@@ -342,8 +343,8 @@ class encryption {
             // todo: check password before saving
             checkPassword();
             //  todo: use md5()
-            //channel.password = md5($(this).val());
-            channel.password = $(this).val();
+            channel.password = md5.hex($(this).val());
+            //channel.password = $(this).val();
             localStorageSave(encryptionStorage);
         });
 
