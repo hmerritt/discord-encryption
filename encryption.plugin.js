@@ -3,7 +3,6 @@ class encryption {
 
     load() {
         //  add crypto lib + some useful functions
-        console.log('Loading encryption..')
         $("head").append(`
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jshashes/1.0.7/hashes.min.js"></script>
       			<script type="text/javascript" src="https://harrymerritt.me/custom_styles/sjcl.php"></script>
@@ -12,7 +11,6 @@ class encryption {
 
         //  load local storage
         window.encryptionStorage = localStorage.discordEncryption ? JSON.parse(localStorage.discordEncryption) : {};
-        console.log('Loaded')
         window.md5 = new Hashes.MD5
     }
 
@@ -21,7 +19,6 @@ class encryption {
     start() {
 //        console.clear();
         this.attachHandler();
-        console.log('Encryption started');
         //  get encryption password
         //  if any errors - set to nothing
             //  get password from storage
@@ -199,7 +196,6 @@ class encryption {
 
           return (encryptionStorage[channel_id]) ? encryptionStorage[channel_id].state : 'off'
         }
-        console.log('Encryption state: ' + encryptionState());
 
         //  icon
         function setCryptState(channel, state) {
@@ -230,7 +226,6 @@ class encryption {
         function setButtonState(state) {
             var state_color = { 'on': '43b581', 'off': '888' };
             var color = (state_color[state]) ? state_color[state] : '888';
-            console.log('setting encryption button state to ' + state);
             $('.encryptionButton').attr('state', state).find('path').attr('fill', '#' + color);
         }
 
@@ -294,7 +289,6 @@ class encryption {
         }
 
         $(document).on('click', "[class^='guild'], .channel, .containerDefault-1ZnADq", function() {
-            console.log('click detected');
             toggleInput('hide');
             initChannel();
             is_encrypted() && decryptAll();
@@ -331,7 +325,6 @@ class encryption {
 
         //  change encryption state
         $(document).on('click', '.encryptionButton', function() {
-            console.log('toggling state..');
             toggleCryptState();
         });
 
@@ -460,7 +453,6 @@ class encryption {
 
             //  create message payload
         		var channel_id = window.location.pathname.split('/').pop();
-            console.log('sending message to ' + channel_id)
         		var data = JSON.stringify({content : message});
 
             //  send message
