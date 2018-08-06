@@ -220,6 +220,7 @@ class encryption {
                 checkPassword();
               }
               setCryptState(channel, 'on');
+              decryptAll();
           }
         }
 
@@ -373,12 +374,13 @@ class encryption {
             });
         }
         //  decrypt all messages
-        decryptAll();
+        //decryptAll();
     }
 
     observer({addedNodes}) {
         if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('chat') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-markup') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-container') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-message') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('hide-overflow') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-wrapper')) {
