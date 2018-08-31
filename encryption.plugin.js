@@ -28,8 +28,29 @@ class encryption {
     start() {
 
 
-//        console.clear();
         this.attachHandler();
+
+
+
+        //  script versions
+        //  check for updates
+        window.discordEncryptionUpdate = false;
+        try {
+            $.get('https://merritt.es/projects/discord-encryption/version.php', function(data) {
+                var thisScript = 138,
+                    latestScript = data ? JSON.parse(data) : 0;
+                if (thisScript < latestScript) {
+                    console.clear();
+                    console.log('');
+                    console.log('[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)');
+                    console.log('');
+                    discordEncryptionUpdate = true;
+                }
+            });
+        } catch (error) {
+            console.error('[Encryption] Error retrieving latest version ('+ error +')');
+        }
+
 
 
         //  get encryption password
@@ -86,6 +107,9 @@ class encryption {
               }
               .encryptionButton:hover path {
                 fill: #fff;
+              }
+              #encryptionButton.updateAvailable path {
+                fill: #7289DA;
               }
 
               .encryptionButton[state=on] path {
@@ -235,7 +259,11 @@ class encryption {
                 document.getElementById('encryptionButton') == undefined) {
 
                 //  add button to html
-                $('button.attachButton-1UjEWA').after(`
+                var attachButton = $('button.da-attachButton');
+                if (attachButton.length == 0) {
+                    attachButton = $('button.attachButton-1UjEWA');
+                }
+                $(attachButton).after(`
                     <svg id="encryptionButton" class="encryptionButton" state="${encryptionState}" style="width:24px;height:24px;padding-right:8px;" viewBox="0 0 24 24">
                       <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
                     </svg>
@@ -284,7 +312,7 @@ class encryption {
         }
 
 
-        $(document).on('click', '.guild, .guild-1EfMGQ, .channel, .contentDefaultText-3vZplL', function() {
+        $(document).on('click', '.da-guildInner, .da-channel, .da-containerDefault, .guild, .guild-1EfMGQ, .channel, .containerDefault-1ZnADq', function() {
             toggleInput('hide');
             setTimeout(function() {
                 addButton();
@@ -369,7 +397,11 @@ class encryption {
         //  decrypt all messages
         function decryptAll() {
             //  loop messages
-            $('.markup-2BOw-j').each(function() {
+            var markup = $('.da-markup');
+            if (markup.length == 0) {
+                markup = $('.markup-2BOw-j');
+            }
+            $(markup).each(function() {
                 var message = $(this).text().trim();
                 //  separate id from message
                 if (message.substring(0, 28) == '--aes256-encrypted-message--') {
@@ -389,7 +421,15 @@ class encryption {
 
     observer({addedNodes}) {
 
-        if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('markup-2BOw-j') ||
+        if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-chat') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-content') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-messagesWrapper') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-scrollerWrap') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-message') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-content') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-markup') ||
+
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('markup-2BOw-j') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('contentCozy-3XX413') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messageCozy-2JPAPA') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('containerCozyBounded-1rKFAn') ||
@@ -420,7 +460,11 @@ class encryption {
                 //  decrypt all messages
                 function decryptAll() {
                     //  loop messages
-                    $('.markup-2BOw-j').each(function() {
+                    var markup = $('.da-markup');
+                    if (markup.length == 0) {
+                        markup = $('.markup-2BOw-j');
+                    }
+                    $(markup).each(function() {
                         var message = $(this).text().trim();
                         //  separate id from message
                         if (message.substring(0, 28) == '--aes256-encrypted-message--') {
