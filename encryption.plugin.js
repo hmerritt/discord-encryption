@@ -71,7 +71,7 @@ class encryption {
               .not-decrypted {
                 color: #FF2949 !important;
               }
-              svg[class*=attachButton] {
+              svg[class*=attachButton-1UjEWA] {
                 position: relative;
                 margin-right: 10px;
               }
@@ -235,7 +235,7 @@ class encryption {
                 document.getElementById('encryptionButton') == undefined) {
 
                 //  add button to html
-                $('button.da-attachButton').after(`
+                $('button.attachButton-1UjEWA').after(`
                     <svg id="encryptionButton" class="encryptionButton" state="${encryptionState}" style="width:24px;height:24px;padding-right:8px;" viewBox="0 0 24 24">
                       <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
                     </svg>
@@ -284,7 +284,7 @@ class encryption {
         }
 
 
-        $(document).on('click', '.guild, .channel, .containerDefault-1ZnADq', function() {
+        $(document).on('click', '.guild, .guild-1EfMGQ, .channel, .contentDefaultText-3vZplL', function() {
             toggleInput('hide');
             setTimeout(function() {
                 addButton();
@@ -369,7 +369,7 @@ class encryption {
         //  decrypt all messages
         function decryptAll() {
             //  loop messages
-            $('.da-markup').each(function() {
+            $('.markup-2BOw-j').each(function() {
                 var message = $(this).text().trim();
                 //  separate id from message
                 if (message.substring(0, 28) == '--aes256-encrypted-message--') {
@@ -389,11 +389,13 @@ class encryption {
 
     observer({addedNodes}) {
 
-        if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('chat') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-markup') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-message') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('hide-overflow') ||
-            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-wrapper')) {
+        if (addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('markup-2BOw-j') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('contentCozy-3XX413') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messageCozy-2JPAPA') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('containerCozyBounded-1rKFAn') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-3amgkR') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('scroller-wrap') ||
+            addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messagesWrapper-3lZDfY')) {
 
 
                 //  decrypt message using set password
@@ -418,7 +420,7 @@ class encryption {
                 //  decrypt all messages
                 function decryptAll() {
                     //  loop messages
-                    $('.da-markup').each(function() {
+                    $('.markup-2BOw-j').each(function() {
                         var message = $(this).text().trim();
                         //  separate id from message
                         if (message.substring(0, 28) == '--aes256-encrypted-message--') {
