@@ -37,18 +37,17 @@ class encryption {
         window.discordEncryptionUpdate = false;
         try {
             $.get('https://merritt.es/projects/discord-encryption/version.php', function(data) {
-                var thisScript = 138,
+                var thisScript = 139,
                     latestScript = data ? JSON.parse(data) : 0;
                 if (thisScript < latestScript) {
-                    console.clear();
-                    console.log('');
-                    console.log('[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)');
-                    console.log('');
+                    console.log('\n[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)\n\n');
                     discordEncryptionUpdate = true;
-                }
+                } else {
+                    console.log('\n[Encryption] You are running the latest version of this script (https://github.com/Hmerritt/discord-encryption)\n\n');
+				}
             });
         } catch (error) {
-            console.error('[Encryption] Error retrieving latest version ('+ error +')');
+            console.error('\n[Encryption] Error retrieving latest version ('+ error +')\n\n');
         }
 
 
@@ -100,7 +99,7 @@ class encryption {
               .encryptionButton {
                 position: relative;
                 cursor: pointer;
-                padding: 9px 0px;
+				margin: auto;
                 padding-left: 2px;
                 -webkit-transition: all 280ms ease;
                 transition: all 280ms ease;
