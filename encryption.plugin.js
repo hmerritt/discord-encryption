@@ -36,12 +36,37 @@ class encryption {
         //  check for updates
         window.discordEncryptionUpdate = false;
         try {
+            //  get script with latest version number
             $.get('https://merritt.es/projects/discord-encryption/version.php', function(data) {
                 var thisScript = 140,
                     latestScript = data ? JSON.parse(data) : 0;
                 if (thisScript < latestScript) {
                     console.log('\n[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)\n\n');
                     discordEncryptionUpdate = true;
+
+                    //  add update pop-up to ui
+                    $('form').append(`
+                        <div id='encryptionUpdate' class='animated fadeInUp'>
+                            <h2>A new version of the discord encryption script is available!</h2>
+                            <span action='close'>No Thanks</span>
+                        </div>
+                    `);
+
+                    //  open link to script on pop-op click
+                    $(document).on('click', '#encryptionUpdate', function(e) {
+                        if (e['target']['localName'] == 'span') {
+                            return false;
+                        }
+                        window.open('https://github.com/Hmerritt/discord-encryption', '_blank');
+                    });
+
+                    //  close pop-up
+                    $(document).on('click', '#encryptionUpdate span[action=close]', function() {
+                        $('#encryptionUpdate').removeClass('fadeInUp').addClass('fadeOutDown');
+                        setTimeout(function() {
+                            $('#encryptionUpdate').remove();
+                        }, 500);
+                    });
                 } else {
                     console.log('\n[Encryption] You are running the latest version of this script (https://github.com/Hmerritt/discord-encryption)\n\n');
 				}
@@ -82,6 +107,63 @@ class encryption {
         //  inject styles
         $('head').append(`
             <style type="text/css">
+
+              #encryptionUpdate {
+                position: absolute;
+                display: flex;
+                align-items: center;
+                top: -10px;
+                left: 0px;
+                width: 100%;
+                height: 40px;
+                overflow: hidden;
+                border-radius: 5px;
+                z-index: 10;
+                cursor: pointer;
+                background-color: #7289DA;
+                -webkit-user-select: none;
+                        user-select: none;
+                -webkit-transition: all 280ms ease 40ms;
+                        transition: all 280ms ease 40ms;
+              }
+              #encryptionUpdate:hover {
+                background-color: #677bc4;
+              }
+              #encryptionUpdate:active {
+                background-color: #5b6eae;
+              }
+
+              #encryptionUpdate h2 {
+                color: #fff;
+                font-size: .85em;
+                margin-left: 1.2em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              #encryptionUpdate span[action=close] {
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                    align-items: center;
+                width: 77px;
+                height: 24px;
+                white-space: nowrap;
+                margin-right: 1.2em;
+                margin-left: auto;
+                border-radius: 3px;
+                border: 1px solid #fff;
+                text-align: center;
+                font-size: .85em;
+                color: #fff;
+              }
+              #encryptionUpdate span[action=close]:hover {
+                color: #7289DA;
+                background-color: #fff;
+              }
+
+
               .decrypted {
                 color: #43b581 !important;
               }
@@ -136,7 +218,7 @@ class encryption {
                 border-radius: 5px;
                 background-color: #FF2949;
                 -webkit-transition: all 280ms ease 10ms;
-                    transition: all 280ms ease 10ms;
+                        transition: all 280ms ease 10ms;
               }
               #encryptionInput.open {
                 top: -28px;
