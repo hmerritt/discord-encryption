@@ -37,7 +37,7 @@ class encryption {
         window.discordEncryptionUpdate = false;
         try {
             $.get('https://merritt.es/projects/discord-encryption/version.php', function(data) {
-                var thisScript = 139,
+                var thisScript = 140,
                     latestScript = data ? JSON.parse(data) : 0;
                 if (thisScript < latestScript) {
                     console.log('\n[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)\n\n');
@@ -311,7 +311,7 @@ class encryption {
         }
 
 
-        $(document).on('click', '.da-guildInner, .da-channel, .da-containerDefault, .guild, .guild-1EfMGQ, .channel, .containerDefault-1ZnADq', function() {
+        $(document).on('click', '.da-guildInner, .da-channel, .da-scroller > span > div, .da-containerDefault, .guild, .guild-1EfMGQ, .channel, .channel-2QD9_O, .containerDefault-1ZnADq', function() {
             toggleInput('hide');
             setTimeout(function() {
                 addButton();
