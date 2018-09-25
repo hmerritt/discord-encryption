@@ -38,7 +38,7 @@ class encryption {
         try {
             //  get script with latest version number
             $.get('https://merritt.es/projects/discord-encryption/version.php', function(data) {
-                var thisScript = 140,
+                var thisScript = 141,
                     latestScript = data ? JSON.parse(data) : 0;
                 if (thisScript < latestScript) {
                     console.log('\n[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)\n\n');
@@ -47,25 +47,31 @@ class encryption {
                     //  add update pop-up to ui
                     $('form').append(`
                         <div id='encryptionUpdate' class='animated fadeInUp'>
-                            <h2>A new version of the discord encryption script is available!</h2>
+                            <h2>An update is available for the discord encryption plugin!</h2>
                             <span action='close'>No Thanks</span>
                         </div>
                     `);
+					
+					//  close pop-up
+					function closePopUp() {
+                        $('#encryptionUpdate').removeClass('fadeInUp').addClass('fadeOutDown');
+                        setTimeout(function() {
+                            $('#encryptionUpdate').remove();
+                        }, 500);
+					}
 
                     //  open link to script on pop-op click
                     $(document).on('click', '#encryptionUpdate', function(e) {
                         if (e['target']['localName'] == 'span') {
                             return false;
                         }
+						closePopUp();
                         window.open('https://github.com/Hmerritt/discord-encryption', '_blank');
                     });
 
                     //  close pop-up
                     $(document).on('click', '#encryptionUpdate span[action=close]', function() {
-                        $('#encryptionUpdate').removeClass('fadeInUp').addClass('fadeOutDown');
-                        setTimeout(function() {
-                            $('#encryptionUpdate').remove();
-                        }, 500);
+						closePopUp();
                     });
                 } else {
                     console.log('\n[Encryption] You are running the latest version of this script (https://github.com/Hmerritt/discord-encryption)\n\n');
@@ -670,7 +676,7 @@ class encryption {
     }
 
     getVersion() {
-        return '1.8.0';
+        return '1.4.1';
     }
 
     getDescription() {
