@@ -17,8 +17,75 @@ class encryption {
     stop() {}
 
     start() {
-//        console.clear();
+      
         this.attachHandler();
+
+        //  script versions
+        //  check for updates
+        window.encryptionUpdate = {
+          'update': false,
+          'ignore': false
+        };
+        function updateCheck() {
+            try {
+                if (!encryptionUpdate['ignore']) {
+                    //  get script with latest version number
+                    $.get('https://merritt.es/projects/discord-encryption/version.php', function(data) {
+                        var currentVersion = 142,
+                            latestVersion = data ? JSON.parse(data) : 0;
+                        if (currentVersion < latestVersion) {
+                            console.log('\n[Encryption] A newer version of this script is available (https://github.com/Hmerritt/discord-encryption)\n\n');
+                            encryptionUpdate['update'] = true;
+
+                            //  add update pop-up to ui
+                            if ($('#encryptionUpdate').length == 0) {
+                                $('form').append(`
+                                    <div id='encryptionUpdate' class='animated fadeInUp'>
+                                        <h2>An update is available for the discord encryption plugin!</h2>
+                                        <span action='close'>No Thanks</span>
+                                    </div>
+                                `);
+                            }
+
+                            //  close pop-up
+                            function closePopUp() {
+                                $('#encryptionUpdate').removeClass('fadeInUp').addClass('fadeOutDown');
+                                encryptionUpdate['ignore'] = true;
+                                setTimeout(function() {
+                                    $('#encryptionUpdate').remove();
+                                }, 500);
+                            }
+
+                            //  open link to script on pop-op click
+                            $(document).on('click', '#encryptionUpdate', function(e) {
+                                if (e['target']['localName'] == 'span' || encryptionUpdate['ignore']) {
+                                    return false;
+                                }
+                                closePopUp();
+                                window.open('https://github.com/Hmerritt/discord-encryption', '_blank');
+                            });
+
+                            //  close pop-up
+                            $(document).on('click', '#encryptionUpdate span[action=close]', function() {
+                                  closePopUp();
+                            });
+                        } else {
+                            console.log('\n[Encryption] You are running the latest version of this script (https://github.com/Hmerritt/discord-encryption)\n\n');
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('\n[Encryption] Error retrieving latest version ('+ error +')\n\n');
+            }
+        }
+
+
+
+        //  check for script update on start
+        updateCheck();
+
+
+
         //  get encryption password
         //  if any errors - set to nothing
             //  get password from storage
@@ -30,6 +97,63 @@ class encryption {
         //  inject styles
         $('head').append(`
             <style type="text/css">
+
+              #encryptionUpdate {
+                position: absolute;
+                display: flex;
+                align-items: center;
+                top: -10px;
+                left: 0px;
+                width: 100%;
+                height: 40px;
+                overflow: hidden;
+                border-radius: 5px;
+                z-index: 10;
+                cursor: pointer;
+                background-color: #7289DA;
+                -webkit-user-select: none;
+                        user-select: none;
+                -webkit-transition: all 280ms ease 40ms;
+                        transition: all 280ms ease 40ms;
+              }
+              #encryptionUpdate:hover {
+                background-color: #677bc4;
+              }
+              #encryptionUpdate:active {
+                background-color: #5b6eae;
+              }
+
+              #encryptionUpdate h2 {
+                color: #fff;
+                font-size: .85em;
+                margin-left: 1.2em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              #encryptionUpdate span[action=close] {
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                    align-items: center;
+                width: 77px;
+                height: 24px;
+                white-space: nowrap;
+                margin-right: 1.2em;
+                margin-left: auto;
+                border-radius: 3px;
+                border: 1px solid #fff;
+                text-align: center;
+                font-size: .85em;
+                color: #fff;
+              }
+              #encryptionUpdate span[action=close]:hover {
+                color: #7289DA;
+                background-color: #fff;
+              }
+
+
               .decrypted {
                 color: #43b581 !important;
               }
@@ -39,7 +163,7 @@ class encryption {
               .not-decrypted {
                 color: #FF2949 !important;
               }
-              svg[class*=attachButton] {
+              svg[class*=attachButton-1UjEWA] {
                 position: relative;
                 margin-right: 10px;
               }
@@ -47,13 +171,16 @@ class encryption {
               .encryptionButton {
                 position: relative;
                 cursor: pointer;
-                padding: 9px 0px;
+				margin: auto;
                 padding-left: 2px;
                 -webkit-transition: all 280ms ease;
                 transition: all 280ms ease;
               }
               .encryptionButton:hover path {
                 fill: #fff;
+              }
+              #encryptionButton.updateAvailable path {
+                fill: #7289DA;
               }
 
               .encryptionButton[state=on] path {
@@ -81,7 +208,7 @@ class encryption {
                 border-radius: 5px;
                 background-color: #FF2949;
                 -webkit-transition: all 280ms ease 10ms;
-                    transition: all 280ms ease 10ms;
+                        transition: all 280ms ease 10ms;
               }
               #encryptionInput.open {
                 top: -28px;
@@ -363,7 +490,11 @@ class encryption {
         //  decrypt all messages
         function decryptAll() {
             //  loop messages
-            $('.da-markup').each(function() {
+            var markup = $('.da-markup');
+            if (markup.length == 0) {
+                markup = $('.markup-2BOw-j');
+            }
+            $(markup).each(function() {
                 var message = $(this).text().trim();
                 //  separate id from message
                 if (message.substring(0, 28) == '--aes256-encrypted-message--') {
@@ -384,6 +515,7 @@ class encryption {
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('da-message') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('hide-overflow') ||
             addedNodes.length && addedNodes[0].classList && addedNodes[0].classList.contains('messages-wrapper')) {
+          
                 //  decrypt message using set password
                 function decrypt(message) {
                     try {
@@ -405,7 +537,11 @@ class encryption {
                 //  decrypt all messages
                 function decryptAll() {
                     //  loop messages
-                    $('.da-markup').each(function() {
+                    var markup = $('.da-markup');
+                    if (markup.length == 0) {
+                        markup = $('.markup-2BOw-j');
+                    }
+                    $(markup).each(function() {
                         var message = $(this).text().trim();
                         //  separate id from message
                         if (message.substring(0, 28) == '--aes256-encrypted-message--') {
@@ -515,11 +651,11 @@ class encryption {
     }
 
     getAuthor() {
-        return 'HMerritt';
+        return 'hmerritt';
     }
 
     getVersion() {
-        return '1.8.0';
+        return '1.4.2';
     }
 
     getDescription() {
