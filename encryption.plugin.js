@@ -19,7 +19,14 @@ class encryption {
         this.pluginName = 'encryptionPlugin';
 
         //  Load user data from local storage
-        this.userData = localStorage[this.pluginName] ? JSON.parse(localStorage[this.pluginName]) : {};
+        this.userData = localStorage[this.pluginName] ?
+                        JSON.parse(localStorage[this.pluginName]) :
+                        {
+                            global: {
+                                password: "",
+                                state:    "off"
+                            }
+                        };
 
         //  Stores component data
         this.components = {};
@@ -50,11 +57,6 @@ class encryption {
 
         //  Inject styles
         this.inject('styles', 'head', 'append', this.components.styles);
-
-        //  TODO: Inject lock icon into messages page
-        //  TODO:
-
-        //  TODO: Build out userData object
     }
 
 
@@ -203,16 +205,53 @@ class encryption {
 
 
         /*
+        * Encryption button
+        * -> displays on every message textbox
+        */
+        this.components.encryptionButton = {};
+        this.components.encryptionButton.html = () =>
+        {
+            return `
+                <button ${this.pluginName}="encryptionButton" state="off" class="encryptionButton">
+                    <svg viewBox="0 0 24 24">
+                        <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
+                    </svg>
+                </button>
+            `;
+        }
+
+        /*
+        * Toggle the button state
+        * -> changes color
+        */
+        this.components.encryptionButton.toggleState = () =>
+        {
+            let $button = $(`[${this.pluginName}].encryptionButton`);
+            if ($button.attr('state') === 'on')
+            {
+                $button.attr('state', 'off');
+            }
+            else
+            {
+                $button.attr('state', 'on');
+            }
+        }
+
+
+        /*
         * Update panel
         * -> displays when an update is available
         */
         this.components.updatePanel = {};
-        this.components.updatePanel.html = `
-            <div ${this.pluginName}="updatePanel" class="updatePanel animated fadeInUp">
-                <h2>An update is available for the discord encryption plugin!</h2>
-                <span action="close">No Thanks</span>
-            </div>
-        `;
+        this.components.updatePanel.html = () =>
+        {
+            return `
+                <div ${this.pluginName}="updatePanel" class="updatePanel animated fadeInUp">
+                    <h2>An update is available for the discord encryption plugin!</h2>
+                    <span action="close">No Thanks</span>
+                </div>
+            `;
+        }
 
         /*
         * Closes update panel
@@ -245,6 +284,43 @@ class encryption {
         */
         this.components.styles = `
             <style ${this.pluginName}="styles">
+
+                .da-attachWrapper {
+                  display: flex;
+                }
+
+                .encryptionButton {
+                  position: relative;
+                  padding: 10px;
+                  cursor: pointer;
+                  background: none;
+                  border-left: 1px solid var(--background-primary);
+                  -webkit-transition: all 280ms ease;
+                          transition: all 280ms ease;
+                }
+                .encryptionButton svg {
+                  width: 24px;
+                  height: 24px;
+                }
+                .encryptionButton:hover path {
+                  fill: #fff;
+                }
+
+                .encryptionButton[state=on] path {
+                  fill: #43b581;
+                }
+                .encryptionButton[state=off] path {
+                  fill: #B9BBBE;
+                }
+
+                .encryptionButton[state=on]:hover path {
+                  fill: #1C9C6D;
+                }
+                .encryptionButton[state=off]:hover path {
+                  fill: #fff;
+                }
+
+
                 .updatePanel {
                   position: absolute;
                   display: flex;
@@ -301,9 +377,6 @@ class encryption {
                 }
 
 
-                /*
-                * Animations
-                */
                 .animated {
                   animation-duration: 280ms;
                   animation-fill-mode: both;
