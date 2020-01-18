@@ -31,13 +31,11 @@ class encryption {
     */
     load()
     {
-        this.log("Script has loaded");
+        //  Initialize DOM components
+        this.initializeComponents();
 
         //  Check for new version
         this.checkForUpdate();
-
-        //  Initialize DOM components
-        this.initializeComponents();
     }
 
 
@@ -131,7 +129,6 @@ class encryption {
         //  Check if element has already been injected
         if (!this.elementExists(`[${this.pluginName}=${name}]`))
         {
-
             //  Decide how to add the content into the page
             switch(how)
             {
@@ -165,7 +162,36 @@ class encryption {
         //  Inject script into 'head'
         this.inject(name, 'head', 'append', `
             <script ${this.pluginName}="${name}" src="${url}">
-        `); //
+        `);
+    }
+
+
+    /*
+    * Fade an object in/out
+    * @param string querySelector
+    * @param string fadeType
+    */
+    fade(querySelector, fadeType, delay=0)
+    {
+        setTimeout(function()
+        {
+            if (fadeType === 'in')
+            {
+                $(querySelector)
+                  .removeClass('fadeOutDown')
+                  .addClass('fadeInUp');
+            }
+            else if (fadeType === 'out')
+            {
+                $(querySelector)
+                  .removeClass('fadeInUp')
+                  .addClass('fadeOutDown');
+                setTimeout(function()
+                {
+                    $(querySelector).remove();
+                }, 500);
+            }
+        }, delay);
     }
 
 
@@ -175,11 +201,167 @@ class encryption {
     initializeComponents()
     {
 
+
+        /*
+        * Update panel
+        * -> displays when an update is available
+        */
+        this.components.updatePanel = {};
+        this.components.updatePanel.html = `
+            <div ${this.pluginName}="updatePanel" class="updatePanel animated fadeInUp">
+                <h2>An update is available for the discord encryption plugin!</h2>
+                <span action="close">No Thanks</span>
+            </div>
+        `;
+
+        /*
+        * Closes update panel
+        * @param int delay
+        */
+        this.components.updatePanel.close = (delay=0) =>
+        {
+            this.version.ignoreUpdate = true;
+            this.fade(`[${this.pluginName}].updatePanel`, 'out', delay);
+        };
+
+        //  Click
+        //  opens github repo / closes panel
+        $(document).on('click', `[${this.pluginName}].updatePanel`, (evt) =>
+        {
+            // Check if user clicked button or ignoreUpdates is on
+            if (evt['target']['localName'] !== 'span' && !this.version.ignoreUpdate)
+            {
+                //  Open link to GitHub
+                window.open('https://github.com/Hmerritt/discord-encryption', '_blank');
+            }
+
+            //  Close panel
+            this.components.updatePanel.close(0);
+        });
+
+
         /*
         * CSS
         */
         this.components.styles = `
             <style ${this.pluginName}="styles">
+                .updatePanel {
+                  position: absolute;
+                  display: flex;
+                  align-items: center;
+                  top: -10px;
+                  left: 0px;
+                  width: 100%;
+                  height: 40px;
+                  z-index: 10;
+                  overflow: hidden;
+                  cursor: pointer;
+                  border-radius: 5px;
+                  background-color: #7289DA;
+                  -webkit-user-select: none;
+                          user-select: none;
+                  -webkit-transition: all 280ms ease 40ms;
+                          transition: all 280ms ease 40ms;
+                }
+                .updatePanel:hover {
+                  background-color: #677bc4;
+                }
+                .updatePanel:active {
+                  background-color: #5b6eae;
+                }
+
+                .updatePanel h2 {
+                  color: #fff;
+                  font-size: .85em;
+                  margin-left: 1.2em;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+
+                .updatePanel span[action=close] {
+                  cursor: pointer;
+                  display: flex;
+                  justify-content: center;
+                      align-items: center;
+                  width: 77px;
+                  height: 24px;
+                  white-space: nowrap;
+                  margin-right: 1.2em;
+                  margin-left: auto;
+                  border-radius: 3px;
+                  border: 1px solid #fff;
+                  text-align: center;
+                  font-size: .85em;
+                  color: #fff;
+                }
+                .updatePanel span[action=close]:hover {
+                  color: #7289DA;
+                  background-color: #fff;
+                }
+
+
+                /*
+                * Animations
+                */
+                .animated {
+                  animation-duration: 280ms;
+                  animation-fill-mode: both;
+                  -webkit-animation-duration: 280ms;
+                  -webkit-animation-fill-mode: both;
+                }
+
+                .fadeInUp {
+                  opacity: 0;
+                  animation-name: fadeInUp;
+                  -webkit-animation-name: fadeInUp;
+                }
+                .fadeOutDown {
+                  opacity: 1;
+                  animation-name: fadeOutDown;
+                  -webkit-animation-name: fadeOutDown;
+                }
+
+                @keyframes fadeInUp {
+                  from {
+                    transform: translate3d(0,-6px,0)
+                  }
+
+                  to {
+                    transform: translate3d(0,-16px,0);
+                    opacity: 1
+                  }
+                }
+                @-webkit-keyframes fadeInUp {
+                  from {
+                    transform: translate3d(0,-6px,0)
+                  }
+
+                  to {
+                    transform: translate3d(0,-16px,0);
+                    opacity: 1
+                  }
+                }
+                @keyframes fadeOutDown {
+                  from {
+                    transform: translate3d(0,-16px,0);
+                  }
+
+                  to {
+                    transform: translate3d(0,-6px,0);
+                    opacity: 0;
+                  }
+                }
+                @-webkit-keyframes fadeOutDown {
+                  from {
+                    transform: translate3d(0,-16px,0);
+                  }
+
+                  to {
+                    transform: translate3d(0,-6px,0);
+                    opacity: 0;
+                  }
+                }
             </style>
         `;
     }
@@ -212,7 +394,7 @@ class encryption {
                 //  Update global var with latest version
                 this.version.latest = latest;
 
-                //  Get script version in number form (remove '.')
+                //  Make script versions a number (remove '.')
                 let currentVersion = this.version.current.replace(/\./g, '');
                 let latestVersion  = latest.replace(/\./g, '');
 
@@ -224,7 +406,8 @@ class encryption {
                     this.log(`An update is available! [${currentVersion} => ${latestVersion}]`);
                 }
             })
-            .fail((res) => {
+            .fail((res) =>
+            {
                 this.log(`Error checking for updates`, 'error');
             });
         }
