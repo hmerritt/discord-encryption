@@ -19,28 +19,31 @@ class encryption {
 
 
     /*
-    * Runs on plugin load (before start)
+    * Runs once on plugin load (before start)
     */
     load()
     {
+        this.log("Script has loaded");
+
         //  TODO: Check for script updates on github
         //        -> load version file
         //        -> compare latest version with current version
+        this.log("Checking for updates...");
     }
 
 
     /*
-    * Runs once plugin has laoded
+    * Runs each time plugin starts (after load on initial start)
     */
     start()
     {
-        //  TODO: Inject required scripts into head
-        //        -> crypto lib
-        //        -> hash   lib
+        //  Import the crypto-js lib
         this.injectScript('cryptojs', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js');
 
         //  TODO: Inject lock icon into messages page
         //  TODO:
+
+        //  TODO: Build out userData object
     }
 
 
@@ -49,7 +52,26 @@ class encryption {
     */
     stop()
     {
-        //  TODO: Unload injected scripts + html
+        //  Remove all elements that have been injected
+        this.removeElements(`[${this.pluginName}]`);
+    }
+
+
+    /*
+    * Creates a log in the console
+    */
+    log(msg, type="")
+    {
+        const prefix = `[${this.pluginName}]`;
+        switch(type)
+        {
+            case "error":
+                console.error(prefix, msg);
+            case "warning":
+                console.warn(prefix, msg);
+            default:
+                console.log(prefix, msg);
+        }
     }
 
 
@@ -70,6 +92,16 @@ class encryption {
 
 
     /*
+    * Remove all elements matching a query
+    * @param string querySelector
+    */
+    removeElements(querySelector)
+    {
+        $(querySelector).remove();
+    }
+
+
+    /*
     * Inject a script into the page
     * @param string name
     * @param string url
@@ -83,6 +115,7 @@ class encryption {
             $('head').append(`
                 <script
                     id="${this.pluginName}--${name}"
+                    ${this.pluginName}=""
                     src="${url}"
                 >
             `);
