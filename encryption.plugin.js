@@ -8,7 +8,12 @@ class encryption {
     constructor()
     {
         //  Script version
-        this.version = '2.0.0';
+        this.version = {
+            current: '2.0.0',
+            latest:  '',
+            update:  false,
+            ignoreUpdate: false
+        };
 
         //  Define plugin name
         this.pluginName = 'encryptionPlugin';
@@ -25,10 +30,9 @@ class encryption {
     {
         this.log("Script has loaded");
 
-        //  TODO: Check for script updates on github
-        //        -> load version file
-        //        -> compare latest version with current version
+        //  Check for new version
         this.log("Checking for updates...");
+        this.checkForUpdate();
     }
 
 
@@ -37,7 +41,7 @@ class encryption {
     */
     start()
     {
-        //  Import the crypto-js lib
+        //  Import crypto-js lib
         this.injectScript('cryptojs', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js');
 
         //  TODO: Inject lock icon into messages page
@@ -59,6 +63,8 @@ class encryption {
 
     /*
     * Creates a log in the console
+    * @param string msg
+    * @param string type
     */
     log(msg, type="")
     {
@@ -67,8 +73,12 @@ class encryption {
         {
             case "error":
                 console.error(prefix, msg);
+                break;
+
             case "warning":
                 console.warn(prefix, msg);
+                break;
+
             default:
                 console.log(prefix, msg);
         }
@@ -109,13 +119,12 @@ class encryption {
     injectScript(name, url)
     {
         //  Check if script has already been injected
-        if (!this.elementExists(`#${this.pluginName}--${name}`))
+        if (!this.elementExists(`[${this.pluginName}=${name}]`))
         {
             //  Inject script into 'head'
             $('head').append(`
                 <script
-                    id="${this.pluginName}--${name}"
-                    ${this.pluginName}=""
+                    ${this.pluginName}="${name}"
                     src="${url}"
                 >
             `);
@@ -124,22 +133,72 @@ class encryption {
 
 
     //--------------------------------------------------------------------
+
+
+    /*
+    * Checks GitHub for a newer version of the script
+    */
+    checkForUpdate()
+    {
+        //  Skip checking if user has previously chosen to ignore the update
+        if (!this.version.ignoreUpdate)
+        {
+            //  Get latest script from GitHub
+            $.ajax({
+                type: 'GET',
+                url:  'https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js'
+            })
+            .then((res) =>
+            {
+                //  Extract latest version from script
+                let latest = res.match(/(?<=current: \').+?(?=\',)/);
+                latest = latest === null ? '' : latest[0];
+
+                //  Update global var with latest version
+                this.version.latest = latest;
+
+                //  Get script version in number form (remove '.')
+                let currentVersion = this.version.current.replace(/\./g, '');
+                let latestVersion  = latest.replace(/\./g, '');
+
+                //  Compare current and latest version
+                if (currentVersion < latestVersion)
+                {
+                    //  Update is available
+                    this.version.update = true;
+                    this.log(`An update is available! [${currentVersion} => ${latestVersion}]`);
+                }
+
+                console.log(latest);
+            })
+            .fail((res) => {
+                this.log(`Error checking for updates`, 'error');
+            });
+        }
+    }
+
+
+    //--------------------------------------------------------------------
     //--------------------------------------------------------------------
 
 
-    getName() {
+    getName()
+    {
         return 'Encryption';
     }
 
-    getAuthor() {
+    getAuthor()
+    {
         return 'hmerritt';
     }
 
-    getVersion() {
-        return this.version;
+    getVersion()
+    {
+        return this.version.current;
     }
 
-    getDescription() {
+    getDescription()
+    {
         return 'Experimental encryption using AES-256';
     }
 };
