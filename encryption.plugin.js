@@ -1,4 +1,4 @@
-//META{"name":"encryption"}*//
+//META{ "name":"encryption", "website":"https://github.com/hmerritt/discord-encryption" }*//
 class encryption {
 
 
@@ -20,6 +20,9 @@ class encryption {
 
         //  Load user data from local storage
         this.userData = localStorage[this.pluginName] ? JSON.parse(localStorage[this.pluginName]) : {};
+
+        //  Stores component data
+        this.components = {};
     }
 
 
@@ -31,8 +34,10 @@ class encryption {
         this.log("Script has loaded");
 
         //  Check for new version
-        this.log("Checking for updates...");
         this.checkForUpdate();
+
+        //  Initialize DOM components
+        this.initializeComponents();
     }
 
 
@@ -41,8 +46,12 @@ class encryption {
     */
     start()
     {
-        //  Import crypto-js lib
+        //  Inject required scripts
+        //  -> crypto-js
         this.injectScript('cryptojs', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js');
+
+        //  Inject styles
+        this.inject('styles', 'head', 'append', this.components.styles);
 
         //  TODO: Inject lock icon into messages page
         //  TODO:
@@ -112,23 +121,67 @@ class encryption {
 
 
     /*
+    * Inject content into the page
+    * @param string querySelector
+    * @param string how
+    * @param string content
+    */
+    inject(name, querySelector, how, content)
+    {
+        //  Check if element has already been injected
+        if (!this.elementExists(`[${this.pluginName}=${name}]`))
+        {
+
+            //  Decide how to add the content into the page
+            switch(how)
+            {
+                case "append":
+                    $(querySelector).append(content);
+                    break;
+
+                case "prepend":
+                    $(querySelector).prepend(content);
+                    break;
+
+                case "after":
+                    $(querySelector).after(content);
+                    break;
+
+                case "before":
+                    $(querySelector).before(content);
+                    break;
+            }
+        }
+    }
+
+
+    /*
     * Inject a script into the page
     * @param string name
     * @param string url
     */
     injectScript(name, url)
     {
-        //  Check if script has already been injected
-        if (!this.elementExists(`[${this.pluginName}=${name}]`))
-        {
-            //  Inject script into 'head'
-            $('head').append(`
-                <script
-                    ${this.pluginName}="${name}"
-                    src="${url}"
-                >
-            `);
-        }
+        //  Inject script into 'head'
+        this.inject(name, 'head', 'append', `
+            <script ${this.pluginName}="${name}" src="${url}">
+        `); //
+    }
+
+
+    /*
+    * Creates global components
+    */
+    initializeComponents()
+    {
+
+        /*
+        * CSS
+        */
+        this.components.styles = `
+            <style ${this.pluginName}="styles">
+            </style>
+        `;
     }
 
 
@@ -143,6 +196,8 @@ class encryption {
         //  Skip checking if user has previously chosen to ignore the update
         if (!this.version.ignoreUpdate)
         {
+            this.log("Checking for updates...");
+
             //  Get latest script from GitHub
             $.ajax({
                 type: 'GET',
@@ -168,8 +223,6 @@ class encryption {
                     this.version.update = true;
                     this.log(`An update is available! [${currentVersion} => ${latestVersion}]`);
                 }
-
-                console.log(latest);
             })
             .fail((res) => {
                 this.log(`Error checking for updates`, 'error');
@@ -199,6 +252,6 @@ class encryption {
 
     getDescription()
     {
-        return 'Experimental encryption using AES-256';
+        return 'Message encryption using AES-256';
     }
 };
