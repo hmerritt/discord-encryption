@@ -7,15 +7,15 @@ class encryption {
     */
     constructor()
     {
+        //  Script version
+        this.version = '2.0.0';
+
         //  Define plugin name
-        this.pluginName = "encryptionPlugin";
+        this.pluginName = 'encryptionPlugin';
 
         //  Load user data from local storage
         this.userData = localStorage[this.pluginName] ? JSON.parse(localStorage[this.pluginName]) : {};
     }
-
-
-    //--------------------------------------------------------------------
 
 
     /*
@@ -23,13 +23,10 @@ class encryption {
     */
     load()
     {
-        //  TODO: inject required scripts into head
-        //        -> crypto lib
-        //        -> hash   lib
+        //  TODO: Check for script updates on github
+        //        -> load version file
+        //        -> compare latest version with current version
     }
-
-
-    //--------------------------------------------------------------------
 
 
     /*
@@ -37,13 +34,14 @@ class encryption {
     */
     start()
     {
-        console.log("userData:", this.userData);
+        //  TODO: Inject required scripts into head
+        //        -> crypto lib
+        //        -> hash   lib
+        this.injectScript('cryptojs', 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js');
 
-        this.userData = {"new": 1}
+        //  TODO: Inject lock icon into messages page
+        //  TODO:
     }
-
-
-    //--------------------------------------------------------------------
 
 
     /*
@@ -51,10 +49,48 @@ class encryption {
     */
     stop()
     {
-
+        //  TODO: Unload injected scripts + html
     }
 
 
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+
+
+    /*
+    * Checks if an element exists in the DOM
+    * @param string querySelector
+    * @return bool
+    */
+    elementExists(querySelector)
+    {
+        if ($(querySelector).length === 0) return false;
+        return true;
+    }
+
+
+    /*
+    * Inject a script into the page
+    * @param string name
+    * @param string url
+    */
+    injectScript(name, url)
+    {
+        //  Check if script has already been injected
+        if (!this.elementExists(`#${this.pluginName}--${name}`))
+        {
+            //  Inject script into 'head'
+            $('head').append(`
+                <script
+                    id="${this.pluginName}--${name}"
+                    src="${url}"
+                >
+            `);
+        }
+    }
+
+
+    //--------------------------------------------------------------------
     //--------------------------------------------------------------------
 
 
@@ -67,7 +103,7 @@ class encryption {
     }
 
     getVersion() {
-        return '2.0.0';
+        return this.version;
     }
 
     getDescription() {
