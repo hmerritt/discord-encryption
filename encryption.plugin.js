@@ -7,20 +7,24 @@ class encryption {
     */
     constructor()
     {
-        //  Script version
-        this.version = {
-            current: '2.0.0',
-            latest:  '',
-            update:  false,
-            ignoreUpdate: false
+        //  Script metadata
+        this.script = {
+            name: 'encryptionPlugin',
+            version: {
+                current: '2.0.0',
+                latest:  '',
+                update:  false,
+                ignoreUpdate: false
+            },
+            link: {
+                repository: 'https://github.com/hmerritt/discord-encryption',
+                source: 'https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js'
+            }
         };
 
-        //  Define plugin name
-        this.pluginName = 'encryptionPlugin';
-
         //  Load user data from local storage
-        this.userData = localStorage[this.pluginName] ?
-                        JSON.parse(localStorage[this.pluginName]) :
+        this.userData = localStorage[this.script.name] ?
+                        JSON.parse(localStorage[this.script.name]) :
                         {
                             global: {
                                 password: "",
@@ -57,6 +61,8 @@ class encryption {
 
         //  Inject styles
         this.inject('styles', 'head', 'append', this.components.styles);
+
+        //  TODO: Inject lock icon into messages page
     }
 
 
@@ -66,7 +72,10 @@ class encryption {
     stop()
     {
         //  Remove all elements that have been injected
-        this.removeElements(`[${this.pluginName}]`);
+        this.removeElements(`[${this.script.name}]`);
+
+        //  Unbind event listners
+        $(document).off('click', '.da-channel, .da-listItem, .da-containerDefault');
     }
 
 
@@ -77,7 +86,7 @@ class encryption {
     */
     log(msg, type="")
     {
-        const prefix = `[${this.pluginName}]`;
+        const prefix = `[${this.script.name}]`;
         switch(type)
         {
             case "error":
@@ -129,7 +138,7 @@ class encryption {
     inject(name, querySelector, how, content)
     {
         //  Check if element has already been injected
-        if (!this.elementExists(`[${this.pluginName}=${name}]`))
+        if (!this.elementExists(`[${this.script.name}=${name}]`))
         {
             //  Decide how to add the content into the page
             switch(how)
@@ -163,7 +172,7 @@ class encryption {
     {
         //  Inject script into 'head'
         this.inject(name, 'head', 'append', `
-            <script ${this.pluginName}="${name}" src="${url}">
+            <script ${this.script.name}="${name}" src="${url}">
         `);
     }
 
@@ -212,12 +221,23 @@ class encryption {
         this.components.encryptionButton.html = () =>
         {
             return `
-                <button ${this.pluginName}="encryptionButton" state="off" class="encryptionButton">
+                <button ${this.script.name}="encryptionButton" state="off" class="encryptionButton">
                     <svg viewBox="0 0 24 24">
                         <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
                     </svg>
                 </button>
             `;
+        }
+
+        //  Inject component into page
+        this.components.encryptionButton.inject = () =>
+        {
+            this.inject(
+              'encryption-button',
+              'button.da-attachButton',
+              'after',
+              this.components.encryptionButton.html()
+            );
         }
 
         /*
@@ -226,7 +246,10 @@ class encryption {
         */
         this.components.encryptionButton.toggleState = () =>
         {
-            let $button = $(`[${this.pluginName}].encryptionButton`);
+            //  Get button element
+            let $button = $(`[${this.script.name}].encryptionButton`);
+
+            //
             if ($button.attr('state') === 'on')
             {
                 $button.attr('state', 'off');
@@ -237,6 +260,11 @@ class encryption {
             }
         }
 
+        $(document).on('click', '.da-channel, .da-listItem, .da-containerDefault', function()
+        {
+            this.components.encryptionButton.inject();
+        }.bind(this));
+
 
         /*
         * Update panel
@@ -246,7 +274,7 @@ class encryption {
         this.components.updatePanel.html = () =>
         {
             return `
-                <div ${this.pluginName}="updatePanel" class="updatePanel animated fadeInUp">
+                <div ${this.script.name}="updatePanel" class="updatePanel animated fadeInUp">
                     <h2>An update is available for the discord encryption plugin!</h2>
                     <span action="close">No Thanks</span>
                 </div>
@@ -259,19 +287,19 @@ class encryption {
         */
         this.components.updatePanel.close = (delay=0) =>
         {
-            this.version.ignoreUpdate = true;
-            this.fade(`[${this.pluginName}].updatePanel`, 'out', delay);
+            this.script.version.ignoreUpdate = true;
+            this.fade(`[${this.script.name}].updatePanel`, 'out', delay);
         };
 
         //  Click
         //  opens github repo / closes panel
-        $(document).on('click', `[${this.pluginName}].updatePanel`, (evt) =>
+        $(document).on('click', `[${this.script.name}].updatePanel`, (evt) =>
         {
             // Check if user clicked button or ignoreUpdates is on
-            if (evt['target']['localName'] !== 'span' && !this.version.ignoreUpdate)
+            if (evt['target']['localName'] !== 'span' && !this.script.version.ignoreUpdate)
             {
                 //  Open link to GitHub
-                window.open('https://github.com/Hmerritt/discord-encryption', '_blank');
+                window.open(this.script.link.repository, '_blank');
             }
 
             //  Close panel
@@ -283,16 +311,16 @@ class encryption {
         * CSS
         */
         this.components.styles = `
-            <style ${this.pluginName}="styles">
+            <style ${this.script.name}="styles">
 
                 .da-attachWrapper {
                   display: flex;
                 }
 
                 .encryptionButton {
-                  position: relative;
-                  padding: 10px;
-                  cursor: pointer;
+                  padding: 0 10px;
+                  height: 44px;
+                  top: 0;
                   background: none;
                   border-left: 1px solid var(--background-primary);
                   -webkit-transition: all 280ms ease;
@@ -301,9 +329,6 @@ class encryption {
                 .encryptionButton svg {
                   width: 24px;
                   height: 24px;
-                }
-                .encryptionButton:hover path {
-                  fill: #fff;
                 }
 
                 .encryptionButton[state=on] path {
@@ -317,7 +342,7 @@ class encryption {
                   fill: #1C9C6D;
                 }
                 .encryptionButton[state=off]:hover path {
-                  fill: #fff;
+                  fill: #dedede;
                 }
 
 
@@ -449,14 +474,14 @@ class encryption {
     checkForUpdate()
     {
         //  Skip checking if user has previously chosen to ignore the update
-        if (!this.version.ignoreUpdate)
+        if (!this.script.version.ignoreUpdate)
         {
             this.log("Checking for updates...");
 
             //  Get latest script from GitHub
             $.ajax({
                 type: 'GET',
-                url:  'https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js'
+                url:  this.script.link.source
             })
             .then((res) =>
             {
@@ -465,17 +490,17 @@ class encryption {
                 latest = latest === null ? '' : latest[0];
 
                 //  Update global var with latest version
-                this.version.latest = latest;
+                this.script.version.latest = latest;
 
                 //  Make script versions a number (remove '.')
-                let currentVersion = this.version.current.replace(/\./g, '');
+                let currentVersion = this.script.version.current.replace(/\./g, '');
                 let latestVersion  = latest.replace(/\./g, '');
 
                 //  Compare current and latest version
                 if (currentVersion < latestVersion)
                 {
                     //  Update is available
-                    this.version.update = true;
+                    this.script.version.update = true;
                     this.log(`An update is available! [${currentVersion} => ${latestVersion}]`);
                 }
             })
@@ -503,7 +528,7 @@ class encryption {
 
     getVersion()
     {
-        return this.version.current;
+        return this.script.version.current;
     }
 
     getDescription()
