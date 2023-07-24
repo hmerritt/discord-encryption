@@ -7,11 +7,6 @@
     "build": "rollup -c && node build/build-patch.cjs",
     "watch": "rollup -c -w"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hmerritt/discord-encryption.git"
-  },
-  "packageManager": "yarn@3.6.1",
   "dependencies": {
     "jquery": "^3.7.0"
   },
@@ -20,5 +15,10 @@
     "@rollup/plugin-node-resolve": "^15.1.0",
     "prepend-file": "^2.0.1",
     "rollup": "^3.26.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hmerritt/discord-encryption.git"
+  },
+  "packageManager": "yarn@3.6.1"
 }
