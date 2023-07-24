@@ -10,5 +10,7 @@ export const config = {
     repository: "https://github.com/hmerritt/discord-encryption",
     source:
       "https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js",
+    sourceConfig:
+      "https://raw.githubusercontent.com/hmerritt/discord-encryption/dev/2.0.0/src/lib/config.ts",
   },
 };

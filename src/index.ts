@@ -243,10 +243,10 @@ export class encryption {
 
     try {
       //  Get latest script from GitHub
-      const res = await (await fetch(this.script.link.source)).text();
+      const res = await (await fetch(this.script.link.sourceConfig)).text();
 
       //  Extract latest version from script
-      const latestMatch = res.match(/(?<=current: \').+?(?=\',)/);
+      const latestMatch = res.match(/(\d.\d.\d)/);
       const latest = latestMatch == null ? "" : latestMatch[0];
 
       log(`${latestMatch}`);
