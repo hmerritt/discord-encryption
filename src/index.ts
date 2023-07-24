@@ -13,6 +13,8 @@ import {
   styles,
 } from "./lib";
 
+import { updatePanel } from "./lib/components";
+
 export class encryption {
   script: typeof config;
   userData: { global: { password: string; state: boolean } };
@@ -184,45 +186,9 @@ export class encryption {
     );
 
     /*
-     * Update panel
-     * -> displays when an update is available
+     * Register components
      */
-    this.components.updatePanel = {};
-    this.components.updatePanel.html = () => {
-      return `
-                <div ${this.script.name}="updatePanel" class="updatePanel animated fadeInUp">
-                    <h2>An update is available for the discord encryption plugin!</h2>
-                    <span action="close">No Thanks</span>
-                </div>
-            `;
-    };
-
-    /*
-     * Closes update panel
-     * @param int delay
-     */
-    this.components.updatePanel.close = (delay = 0) => {
-      this.script.version.ignoreUpdate = true;
-      fade(`[${this.script.name}].updatePanel`, "out", delay);
-    };
-
-    /*
-     * Click
-     * opens github repo / closes update panel
-     */
-    $(document).on("click", `[${this.script.name}].updatePanel`, (evt) => {
-      //  Check if user clicked close button or ignoreUpdates is on
-      if (
-        evt["target"]["localName"] !== "span" &&
-        !this.script.version.ignoreUpdate
-      ) {
-        //  Open link to GitHub
-        window.open(this.script.link.repository, "_blank");
-      }
-
-      //  Close panel
-      this.components.updatePanel.close(0);
-    });
+    this.components.updatePanel = updatePanel;
 
     /*
      * CSS
@@ -268,6 +234,9 @@ export class encryption {
         //  Update is available
         this.script.version.update = true;
         log(`An update is available! [${currentVersion} => ${latestVersion}]`);
+
+        //  add update pop-up to ui
+        this.components.updatePanel.inject();
       }
     } catch (err) {
       log("error", `Error checking for updates: ${err}`);

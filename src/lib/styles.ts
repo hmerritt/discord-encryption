@@ -45,7 +45,7 @@ export const styles = css`
     position: absolute;
     display: flex;
     align-items: center;
-    top: -10px;
+    top: 15px;
     left: 0px;
     width: 100%;
     height: 40px;
