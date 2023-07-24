@@ -7,6 +7,7 @@ import {
   elementExists,
   fade,
   inject,
+  injectLog,
   log,
   removeElements,
   styles,
@@ -51,6 +52,8 @@ export class encryption {
    * Runs once on plugin load (before start)
    */
   load() {
+    injectLog();
+
     //  Initialize DOM components
     this.initializeComponents();
 
@@ -267,7 +270,7 @@ export class encryption {
         log(`An update is available! [${currentVersion} => ${latestVersion}]`);
       }
     } catch (err) {
-      log(`Error checking for updates: ${err}`, "error");
+      log("error", `Error checking for updates: ${err}`);
     }
   }
 
