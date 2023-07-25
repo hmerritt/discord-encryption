@@ -4,8 +4,9 @@ import {
   checkInputPassword,
   getEncryptionPassword,
   isEncryptionOn,
+  saveUserData,
 } from "../storage";
-import { fade, inject } from "../helpers";
+import { fade, getChannelId, getOrCreateUserData, inject } from "../helpers";
 import { Config, UserData } from "../config";
 import { encryptionInput } from "./encryptionInput";
 
@@ -50,12 +51,18 @@ const close = (script: Config, userData: UserData, delay = 0) => {
 
 const toggleState = (script: Config, userData: UserData) => {
   const $button = $(`[${script.name}].${componentName}`);
+  const channelId = getChannelId() || "global";
+  getOrCreateUserData(userData, channelId);
 
   if ($button.attr("state") === "true") {
     $button.attr("state", "false");
+    userData[channelId].state = false;
   } else {
     $button.attr("state", "true");
+    userData[channelId].state = true;
   }
+
+  saveUserData(userData);
 };
 
 export const encryptionButton = (script: Config, userData: UserData) => ({

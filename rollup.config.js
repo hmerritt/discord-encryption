@@ -12,7 +12,7 @@ export default {
 		sourcemap: false
 	},
 	plugins: [
-		typescript({ lib: ["es5", "es6", "dom"], allowSyntheticDefaultImports: true }),
+		typescript(),
 		resolve(), // tells Rollup how to find date-fns in node_modules
 		commonjs(), // converts date-fns to ES modules
 	],

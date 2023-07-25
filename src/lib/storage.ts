@@ -12,11 +12,17 @@ export const getUserData = (): UserData => {
     },
   };
 
-  if (typeof localStorage === "undefined") return defaultUserData;
-
   try {
-    const getUserData = JSON.parse(localStorage.getItem(config.name) || "");
-    if (getUserData?.global) return getUserData;
+    if (typeof window?.BdApi?.Data !== "undefined") {
+      const getUserData = window?.BdApi?.Data.load(config.name, config.name);
+      log("getUserData window?.BdApi?.Data.load", getUserData);
+      if (getUserData?.global) return getUserData;
+    }
+
+    if (typeof localStorage !== "undefined") {
+      const getUserData = JSON.parse(localStorage.getItem(config.name) || "");
+      if (getUserData?.global) return getUserData;
+    }
   } catch (error) {
     log("error", "Error parsing local storage", error);
   }
@@ -26,11 +32,19 @@ export const getUserData = (): UserData => {
 
 export const saveUserData = (userData: any) => {
   try {
-    if (typeof localStorage !== "undefined") {
-      localStorage.setItem(config.name, JSON.stringify(userData));
-    } else {
-      log("warn", "localStorage not found, did not save data");
+    if (typeof window?.BdApi?.Data !== "undefined") {
+      return window?.BdApi?.Data.save(
+        config.name,
+        config.name,
+        JSON.stringify(userData)
+      );
     }
+
+    if (typeof localStorage !== "undefined") {
+      return localStorage.setItem(config.name, JSON.stringify(userData));
+    }
+
+    log("warn", "No storage found, did not save data");
   } catch (error) {
     log("error", "Error saving to local storage", error);
   }

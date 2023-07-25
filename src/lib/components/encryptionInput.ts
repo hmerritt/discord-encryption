@@ -2,7 +2,7 @@ import $ from "jquery";
 
 import { log } from "../log";
 import { Config, UserData } from "../config";
-import { getChannelId, fade, inject } from "../helpers";
+import { getChannelId, fade, inject, getOrCreateUserData } from "../helpers";
 import { checkInputPassword, saveUserData } from "../storage";
 
 /**
@@ -31,13 +31,9 @@ const html = (script: Config, userData: UserData) => {
     // set password and save in storage
     checkInputPassword();
     log("encryptionInput", userData);
-    if (getChannelId() && !userData[getChannelId() ?? ""]) {
-      userData[getChannelId() || "global"] = {
-        state: false,
-        password: userData.global?.password || "",
-      };
-    }
-    userData[getChannelId() || "global"].password = evt.target.value;
+    const channelId = getChannelId() || "global";
+    getOrCreateUserData(userData, channelId);
+    userData[channelId].password = evt.target.value;
     saveUserData(userData);
   };
 

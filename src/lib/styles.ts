@@ -16,12 +16,12 @@ export const styles = css`
   .encryptionButton {
     top: 0;
     height: 44px;
-    padding: 10px 12px;
+    padding: 10px 8px;
+    padding-right: 18px;
     position: sticky;
     background: none;
-    border-left: 1px solid var(--background-primary);
-    -webkit-transition: all 280ms ease;
     transition: all 280ms ease;
+    -webkit-transition: all 280ms ease;
   }
   .encryptionButton svg {
     width: 24px;
@@ -57,8 +57,8 @@ export const styles = css`
     background-color: #7289da;
     -webkit-user-select: none;
     user-select: none;
-    -webkit-transition: all 280ms ease 40ms;
     transition: all 280ms ease 40ms;
+    -webkit-transition: all 280ms ease 40ms;
   }
   .updatePanel:hover {
     background-color: #677bc4;

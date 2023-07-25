@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import { config } from "./config";
+import { UserData, config } from "./config";
 
 /**
  * Checks if an element exists in the DOM.
@@ -31,6 +31,23 @@ export const fade = (querySelector, fadeType, delay = 0) => {
  */
 export const getChannelId = () => {
   return window.location.pathname.split("/").pop();
+};
+
+/**
+ * Create object if it does not exist.
+ */
+export const getOrCreateUserData = (
+  userData: UserData,
+  channelId = "global"
+) => {
+  if (!userData[channelId]) {
+    userData[channelId] = {
+      state: userData?.global?.state ?? false,
+      password: userData?.global?.password ?? "",
+    };
+  }
+
+  return userData[channelId];
 };
 
 /**
