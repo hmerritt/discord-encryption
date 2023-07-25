@@ -1,8 +1,8 @@
 import $ from "jquery";
 import crypto from "crypto-js";
 
-import { UserData } from "./config";
 import { log } from "./log";
+import { UserData } from "./config";
 
 const PREFIX = "#!aes/";
 
