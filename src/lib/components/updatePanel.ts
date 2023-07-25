@@ -1,5 +1,5 @@
-import { config } from "../config";
-import { fade, inject } from "../helpers-dom";
+import { Config, UserData } from "../config";
+import { fade, inject } from "../helpers";
 
 /**
  * Update panel. Displays when an update is available.
@@ -7,9 +7,9 @@ import { fade, inject } from "../helpers-dom";
 
 const componentName = "updatePanel";
 
-const html = () => {
+const html = (script: Config, userData: UserData) => {
   const $div = document.createElement("div");
-  $div.setAttribute(config.name, componentName);
+  $div.setAttribute(script.name, componentName);
   $div.setAttribute("class", `${componentName} animated fadeInUp`);
 
   $div.innerHTML = `
@@ -21,23 +21,23 @@ const html = () => {
     // Open link to GitHub if:
     // 1. User didn't click on close button
     // 2. ignoreUpdates is true
-    if (evt?.target?.localName !== "span" && !config.version.ignoreUpdate) {
-      window.open(config.link.repository, "_blank");
+    if (evt?.target?.localName !== "span" && !script.version.ignoreUpdate) {
+      window.open(script.link.repository, "_blank");
     }
 
-    close(0);
+    close(script, userData, 0);
   };
 
   return $div;
 };
 
-const close = (delay = 0) => {
-  config.version.ignoreUpdate = true;
-  fade(`[${config.name}].${componentName}`, "out", delay);
+const close = (script: Config, userData: UserData, delay = 0) => {
+  script.version.ignoreUpdate = true;
+  fade(`[${script.name}].${componentName}`, "out", delay);
 };
 
-export const updatePanel = {
-  html,
-  close,
-  inject: () => inject(componentName, "form", "after", html()),
-};
+export const updatePanel = (script: Config, userData: UserData) => ({
+  html: () => html(script, userData),
+  close: (delay = 0) => close(script, userData, delay),
+  inject: () => inject(componentName, "form", "after", html(script, userData)),
+});

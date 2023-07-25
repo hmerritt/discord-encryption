@@ -1,10 +1,10 @@
 import $ from "jquery";
 
 import { log } from "./log";
-import { config } from "./config";
-import { getChannelId } from "./discord";
+import { getChannelId } from "./helpers";
+import { UserData, config } from "./config";
 
-export const getUserData = () => {
+export const getUserData = (): UserData => {
   const defaultUserData = {
     global: {
       password: "",
@@ -19,7 +19,6 @@ export const getUserData = () => {
     if (getUserData?.global) return getUserData;
   } catch (error) {
     log("error", "Error parsing local storage", error);
-    return defaultUserData;
   }
 
   return defaultUserData;

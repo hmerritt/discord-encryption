@@ -3,6 +3,8 @@ import $ from "jquery";
 import crypto from "crypto-js";
 
 import {
+  Config,
+  UserData,
   config,
   getChannelId,
   getUserData,
@@ -14,11 +16,15 @@ import {
   styles,
 } from "./lib";
 
-import { encryptionButton, updatePanel } from "./lib/components";
+import {
+  encryptionButton,
+  encryptionInput,
+  updatePanel,
+} from "./lib/components";
 
 export class encryption {
-  script: typeof config;
-  userData: { global: { password: string; state: boolean } };
+  script: Config;
+  userData: UserData;
   components: any;
 
   /*
@@ -88,9 +94,17 @@ export class encryption {
     /*
      * Register components
      */
-    this.components.updatePanel = updatePanel;
-    this.components.encryptionButton = encryptionButton;
-    this.components.encryptionButton.inject(this.userData);
+    this.components.updatePanel = updatePanel(this.script, this.userData);
+    this.components.encryptionButton = encryptionButton(
+      this.script,
+      this.userData
+    );
+    this.components.encryptionInput = encryptionInput(
+      this.script,
+      this.userData
+    );
+
+    this.components.encryptionButton.inject();
 
     /*
      * Makes sure button is always injected
@@ -100,7 +114,7 @@ export class encryption {
       "click",
       ".da-channel, .da-listItem, .da-containerDefault",
       function () {
-        this.components.encryptionButton.inject(this.userData);
+        this.components.encryptionButton.inject();
       }.bind(this)
     );
   }
