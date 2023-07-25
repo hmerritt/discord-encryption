@@ -5,10 +5,12 @@ import { fade, inject } from "../helpers-dom";
  * Update panel. Displays when an update is available.
  */
 
+const componentName = "updatePanel";
+
 const html = () => {
   const $div = document.createElement("div");
-  $div.setAttribute(config.name, "updatePanel");
-  $div.setAttribute("class", "updatePanel animated fadeInUp");
+  $div.setAttribute(config.name, componentName);
+  $div.setAttribute("class", `${componentName} animated fadeInUp`);
 
   $div.innerHTML = `
     <h2>An update is available for the discord encryption plugin!</h2>
@@ -31,11 +33,11 @@ const html = () => {
 
 const close = (delay = 0) => {
   config.version.ignoreUpdate = true;
-  fade(`[${config.name}].updatePanel`, "out", delay);
+  fade(`[${config.name}].${componentName}`, "out", delay);
 };
 
 export const updatePanel = {
   html,
   close,
-  inject: inject("updatePanel", "form", "after", html()),
+  inject: () => inject(componentName, "form", "after", html()),
 };
