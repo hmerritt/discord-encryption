@@ -1,7 +1,10 @@
 import $ from "jquery";
 
 import { config } from "../config";
+import { getChannelId } from "../discord";
 import { fade, inject } from "../helpers-dom";
+import { checkInputPassword, saveUserData } from "../storage";
+import { log } from "../log";
 
 /**
  * Encryption input
@@ -9,11 +12,13 @@ import { fade, inject } from "../helpers-dom";
 
 const componentName = "encryptionInput";
 
-const html = () => {
+const html = (userData: any) => {
   const $div = document.createElement("div");
   $div.setAttribute("id", componentName);
   $div.setAttribute(config.name, componentName);
   $div.setAttribute("class", `${componentName} animated fadeInUp`);
+
+  log("encryptionInput", userData);
 
   $div.innerHTML = `
     <svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -22,9 +27,19 @@ const html = () => {
     <input placeholder="Encryption password" type="password">
   `;
 
-  // $div.onclick = (evt: any) => {
-  //   toggleState();
-  // };
+  // Change password on typing.
+  $div.onkeyup = (evt: any) => {
+    // set password and save in storage
+    checkInputPassword();
+    log("encryptionInput", userData);
+    if (getChannelId() && !userData[getChannelId() ?? ""]) {
+      userData[getChannelId() || "global"] = {
+        state: false,
+      };
+    }
+    userData[getChannelId() || "global"].password = evt.target.value;
+    saveUserData(userData);
+  };
 
   return $div;
 };
@@ -34,9 +49,9 @@ const close = (delay = 0) => {
   fade(`[${config.name}].${componentName}`, "out", delay);
 };
 
-const toggleInput = (action = "") => {
+const toggleInput = (userData: any, action = "") => {
   if (action == "show" || (action == "" && $("#encryptionInput").length == 0)) {
-    inject(componentName, `form`, "append", html());
+    inject(componentName, `form`, "append", html(userData));
   } else {
     $("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
     setTimeout(function () {
@@ -49,5 +64,6 @@ export const encryptionInput = {
   html,
   close,
   toggleInput,
-  inject: () => inject(componentName, `form`, "append", html()),
+  inject: (userData: any) =>
+    inject(componentName, `form`, "append", html(userData)),
 };

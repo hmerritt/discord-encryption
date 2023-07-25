@@ -3,6 +3,11 @@ import $ from "jquery";
 import { config } from "../config";
 import { fade, inject } from "../helpers-dom";
 import { encryptionInput } from "./encryptionInput";
+import {
+  checkInputPassword,
+  getEncryptionPassword,
+  isEncryptionOn,
+} from "../storage";
 
 /**
  * Encryption button
@@ -10,10 +15,10 @@ import { encryptionInput } from "./encryptionInput";
 
 const componentName = "encryptionButton";
 
-const html = (state: boolean) => {
+const html = (userData: any) => {
   const $button = document.createElement("button");
   $button.setAttribute(config.name, componentName);
-  $button.setAttribute("state", `${state ?? false}`);
+  $button.setAttribute("state", `${isEncryptionOn(userData) ?? false}`);
   $button.setAttribute("class", componentName);
 
   $button.innerHTML = `
@@ -24,14 +29,15 @@ const html = (state: boolean) => {
 
   $button.onclick = (evt: any) => {
     toggleState();
+    $(`[role="textbox"]`).focus();
   };
 
   //  bind right click to adding encryption input
   $button.oncontextmenu = (evt: any) => {
     evt.preventDefault();
-    encryptionInput.toggleInput("");
-    // $("#encryptionInput input").val(get_password());
-    // checkPassword();
+    encryptionInput.toggleInput(userData, "");
+    $("#encryptionInput input").val(getEncryptionPassword(userData));
+    checkInputPassword();
   };
 
   return $button;
@@ -56,11 +62,11 @@ export const encryptionButton = {
   html,
   close,
   toggleState,
-  inject: (state: boolean) =>
+  inject: (userData: any) =>
     inject(
       componentName,
       `button[aria-label="Upload a file or send invites"]`,
       "after",
-      html(state)
+      html(userData)
     ),
 };

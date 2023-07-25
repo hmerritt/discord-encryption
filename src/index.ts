@@ -5,8 +5,10 @@ import crypto from "crypto-js";
 import {
   config,
   getChannelId,
+  getUserData,
   inject,
   injectLog,
+  isEncryptionOn,
   log,
   removeElements,
   styles,
@@ -19,10 +21,6 @@ export class encryption {
   userData: { global: { password: string; state: boolean } };
   components: any;
 
-  // Move these `initializeComponents` to lib
-  discord: any;
-  encryption: any;
-
   /*
    * Define global variables
    */
@@ -31,19 +29,7 @@ export class encryption {
     this.script = { ...config };
 
     //  Load user data from local storage
-    this.userData = {
-      global: {
-        password: "",
-        state: false,
-      },
-    };
-
-    if (typeof localStorage !== "undefined") {
-      const getUserDataFromStorage = JSON.parse(localStorage[this.script.name]);
-      if (getUserDataFromStorage) {
-        this.userData = getUserDataFromStorage;
-      }
-    }
+    this.userData = getUserData();
 
     //  Stores component data
     this.components = {};
@@ -82,7 +68,6 @@ export class encryption {
 
     //  Unbind event listners
     $(document).off("click", ".da-channel, .da-listItem, .da-containerDefault");
-    $(document).off("click", `[${this.script.name}].updatePanel`);
   }
 
   //--------------------------------------------------------------------
@@ -92,31 +77,6 @@ export class encryption {
    * Creates global components
    */
   initializeComponents() {
-    /*
-     * Encryption
-     * -> helper functions to handle the encrypt/decrypting
-     */
-    this.encryption = {};
-    this.encryption.get = {};
-    this.encryption.set = {};
-
-    /*
-     * Get encryption state for current chat
-     * @return bool
-     */
-    this.encryption.get;
-    this.encryption.get.state = () => {
-      let channelId = getChannelId() || "";
-      let globalState = this.userData.global.state;
-      let chatState = this.userData[channelId]
-        ? this.userData[channelId].state
-        : false;
-      if (globalState || chatState) {
-        return true;
-      }
-      return false;
-    };
-
     /*
      * CSS
      */
@@ -130,6 +90,7 @@ export class encryption {
      */
     this.components.updatePanel = updatePanel;
     this.components.encryptionButton = encryptionButton;
+    this.components.encryptionButton.inject(this.userData);
 
     /*
      * Makes sure button is always injected
@@ -139,7 +100,7 @@ export class encryption {
       "click",
       ".da-channel, .da-listItem, .da-containerDefault",
       function () {
-        this.components.encryptionButton.inject(this.encryption.get.state());
+        this.components.encryptionButton.inject(this.userData);
       }.bind(this)
     );
   }
