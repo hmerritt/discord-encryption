@@ -4,8 +4,6 @@ import crypto from "crypto-js";
 
 import {
   config,
-  elementExists,
-  fade,
   getChannelId,
   inject,
   injectLog,
@@ -164,16 +162,12 @@ export class encryption {
       const latestMatch = res.match(/(\d.\d.\d)/);
       const latest = latestMatch == null ? "" : latestMatch[0];
 
-      log(`${latestMatch}`);
-
       //  Update global var with latest version
       this.script.version.latest = latest;
 
       //  Make script versions a number (remove '.')
       const currentVersion = this.script.version.current.replace(/\./g, "");
       const latestVersion = latest.replace(/\./g, "");
-
-      log(`${currentVersion} : ${latestVersion}`);
 
       //  Compare current and latest version
       if (currentVersion < latestVersion) {

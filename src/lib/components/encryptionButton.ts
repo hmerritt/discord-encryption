@@ -2,6 +2,7 @@ import $ from "jquery";
 
 import { config } from "../config";
 import { fade, inject } from "../helpers-dom";
+import { encryptionInput } from "./encryptionInput";
 
 /**
  * Encryption button
@@ -12,7 +13,7 @@ const componentName = "encryptionButton";
 const html = (state: boolean) => {
   const $button = document.createElement("button");
   $button.setAttribute(config.name, componentName);
-  $button.setAttribute("state", `${state}`);
+  $button.setAttribute("state", `${state ?? false}`);
   $button.setAttribute("class", componentName);
 
   $button.innerHTML = `
@@ -22,14 +23,15 @@ const html = (state: boolean) => {
   `;
 
   $button.onclick = (evt: any) => {
-    // Open link to GitHub if:
-    // 1. User didn't click on close button
-    // 2. ignoreUpdates is true
-    if (evt?.target?.localName !== "span" && !config.version.ignoreUpdate) {
-      window.open(config.link.repository, "_blank");
-    }
+    toggleState();
+  };
 
-    close(0);
+  //  bind right click to adding encryption input
+  $button.oncontextmenu = (evt: any) => {
+    evt.preventDefault();
+    encryptionInput.toggleInput("");
+    // $("#encryptionInput input").val(get_password());
+    // checkPassword();
   };
 
   return $button;
@@ -43,10 +45,10 @@ const close = (delay = 0) => {
 const toggleState = () => {
   const $button = $(`[${config.name}].${componentName}`);
 
-  if ($button.attr("state") === "on") {
-    $button.attr("state", "off");
+  if ($button.attr("state") === "true") {
+    $button.attr("state", "false");
   } else {
-    $button.attr("state", "on");
+    $button.attr("state", "true");
   }
 };
 
@@ -55,5 +57,10 @@ export const encryptionButton = {
   close,
   toggleState,
   inject: (state: boolean) =>
-    inject(componentName, "button.da-attachButton", "after", html(state)),
+    inject(
+      componentName,
+      `button[aria-label="Upload a file or send invites"]`,
+      "after",
+      html(state)
+    ),
 };

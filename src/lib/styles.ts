@@ -9,14 +9,15 @@ const css = (strings, ...values) => String.raw({ raw: strings }, ...values);
  * CSS styles
  */
 export const styles = css`
-  .da-attachWrapper {
+  form div[class^="attachWrapper"] {
     display: flex;
   }
 
   .encryptionButton {
-    padding: 0 10px;
-    height: 44px;
     top: 0;
+    height: 44px;
+    padding: 10px 12px;
+    position: sticky;
     background: none;
     border-left: 1px solid var(--background-primary);
     -webkit-transition: all 280ms ease;
