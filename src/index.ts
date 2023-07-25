@@ -1,12 +1,14 @@
 //META{ "name":"encryption", "website":"https://github.com/hmerritt/discord-encryption" }*//
 import $ from "jquery";
-import crypto from "crypto-js";
 
 import {
   Config,
   UserData,
   config,
+  decryptAllMessages,
+  encrypt,
   getChannelId,
+  getOrCreateUserData,
   getUserData,
   inject,
   injectLog,
@@ -63,6 +65,28 @@ export class encryption {
 
     //  Inject encryption button on start
     this.components.encryptionButton.inject();
+
+    /*
+     * Makes sure button is always injected
+     * Re-inject button when user changes chat/channel
+     */
+    $(document).on(
+      "click",
+      `[aria-label="Servers"] > div, [aria-label="Channels"] li a, [aria-label="Direct Messages"] li`,
+      function () {
+        this.components.encryptionInput.toggleInput("hide");
+
+        const channelId = getChannelId() || "global";
+        const channelState = getOrCreateUserData(this.userData, channelId);
+        setTimeout(() => {
+          this.components.encryptionButton.inject();
+        }, 88);
+
+        // log("ENC TEST", encrypt("test", { state: true, password: "123" }));
+
+        channelState.state && decryptAllMessages(channelState);
+      }.bind(this)
+    );
   }
 
   /*
@@ -73,7 +97,10 @@ export class encryption {
     removeElements(`[${this.script.name}]`);
 
     //  Unbind event listners
-    $(document).off("click", ".da-channel, .da-listItem, .da-containerDefault");
+    $(document).off(
+      "click",
+      `[aria-label="Servers"] > div, [aria-label="Channels"] li a, [aria-label="Direct Messages"] li`
+    );
   }
 
   //--------------------------------------------------------------------
@@ -105,18 +132,6 @@ export class encryption {
     );
 
     this.components.encryptionButton.inject();
-
-    /*
-     * Makes sure button is always injected
-     * Re-inject button when user changes chat/channel
-     */
-    $(document).on(
-      "click",
-      ".da-channel, .da-listItem, .da-containerDefault",
-      function () {
-        this.components.encryptionButton.inject();
-      }.bind(this)
-    );
   }
 
   //--------------------------------------------------------------------

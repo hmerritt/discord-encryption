@@ -93,6 +93,16 @@ export const styles = css`
     background-color: rgb(67, 181, 129);
   }
 
+  .decrypted {
+    color: #43b581 !important;
+  }
+  .decrypted a {
+    color: #1c9c6d !important;
+  }
+  .not-decrypted {
+    color: #ff2949 !important;
+  }
+
   .updatePanel {
     position: absolute;
     display: flex;

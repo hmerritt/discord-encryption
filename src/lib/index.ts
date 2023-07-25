@@ -1,4 +1,5 @@
 export * from "./config";
+export * from "./crypto";
 export * from "./helpers";
 export * from "./log";
 export * from "./storage";
