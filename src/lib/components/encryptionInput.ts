@@ -47,7 +47,7 @@ const close = (script: Config, userData: UserData, delay = 0) => {
 
 const toggleInput = (script: Config, userData: UserData, action = "") => {
   if (action == "show" || (action == "" && $("#encryptionInput").length == 0)) {
-    inject(componentName, `form`, "append", html(script, userData));
+    inject(componentName, `form`, "before", html(script, userData));
   } else {
     $("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
     setTimeout(function () {
@@ -59,7 +59,7 @@ const toggleInput = (script: Config, userData: UserData, action = "") => {
 export const encryptionInput = (script: Config, userData: UserData) => ({
   html: () => html(script, userData),
   close: (delay = 0) => close(script, userData, delay),
-  inject: () => inject(componentName, "form", "append", html(script, userData)),
+  inject: () => inject(componentName, "form", "before", html(script, userData)),
   //
   toggleInput: (action = "") => toggleInput(script, userData, action),
 });

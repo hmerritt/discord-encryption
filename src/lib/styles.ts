@@ -42,6 +42,57 @@ export const styles = css`
     fill: #dedede;
   }
 
+  #encryptionInput {
+    position: relative;
+    width: 280px;
+    height: 40px;
+    overflow: hidden;
+    margin-left: 16px;
+    border-radius: 5px;
+    background-color: #ff2949;
+    -webkit-transition: all 280ms ease 10ms;
+    transition: all 280ms ease 10ms;
+  }
+
+  #encryptionInput svg {
+    position: absolute;
+    cursor: pointer;
+    top: 8px;
+    left: 10px;
+    z-index: 1;
+  }
+
+  #encryptionInput input {
+    position: absolute;
+    top: 0px;
+    left: 34px;
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-indent: 4px;
+    border-radius: 5px;
+    background-color: #ff2949;
+    -webkit-transition: all 280ms ease;
+    transition: all 280ms ease;
+    outline: 0px !important;
+    -webkit-appearance: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    resize: none;
+    color: #ddd;
+    font-size: 0.88em;
+    padding: 1px 8px;
+    white-space: nowrap;
+  }
+  #encryptionInput input::placeholder {
+    color: #ddd;
+  }
+
+  #encryptionInput.nice-password,
+  #encryptionInput.nice-password input {
+    background-color: rgb(67, 181, 129);
+  }
+
   .updatePanel {
     position: absolute;
     display: flex;
