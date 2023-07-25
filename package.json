@@ -5,7 +5,7 @@
   "description": "An experimental encryption solution for Discord",
   "scripts": {
     "build": "rollup -c && node build/build-patch.cjs",
-    "watch": "rollup -c -w"
+    "build:dev": "rollup -c && node build/build-patch.cjs dev"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
