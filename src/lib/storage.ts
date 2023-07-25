@@ -15,7 +15,6 @@ export const getUserData = (): UserData => {
   try {
     if (typeof window?.BdApi?.Data !== "undefined") {
       const getUserData = window?.BdApi?.Data.load(config.name, config.name);
-      log("getUserData window?.BdApi?.Data.load", getUserData);
       if (getUserData?.global) return getUserData;
     }
 
