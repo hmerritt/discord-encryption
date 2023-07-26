@@ -12,9 +12,4 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-bundle/*
-output/*
-bundle.js
-output.js
-bundle.js.map
-output.js.map
+encryption.plugin.js
