@@ -2,7 +2,9 @@
 
 > We're back baby :)
 
-An experimental encryption solution for Discord using [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp/releases)
+An experimental encryption solution for Discord using [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp/releases).
+
+Download the `encryption.plugin.js` from the releases [here](https://github.com/hmerritt/discord-encryption/releases/latest).
 
 ## Features
 
