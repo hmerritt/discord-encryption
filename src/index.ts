@@ -30,14 +30,13 @@ export default !window.ZeresPluginLibrary
   : (([Plugin, Api]) => {
       const plugin = (Plugin, Api) => {
         const {
-          DiscordModules,
-          WebpackModules,
-          Toasts,
           DiscordClasses,
-          Utilities,
+          DiscordModules,
           DOMTools,
-          ColorConverter,
+          Patcher,
           ReactTools,
+          Utilities,
+          WebpackModules,
         } = Api;
 
         return class Encryption extends Plugin {
@@ -82,6 +81,28 @@ export default !window.ZeresPluginLibrary
             inject("styles", "head", "append", this.components.styles);
 
             this.bootstrapUi();
+
+            Patcher.before(
+              DiscordModules.MessageActions,
+              "sendMessage",
+              (t, a) => {
+                console.log("PATCH", t, a);
+                let message = a[1].content;
+
+                if (
+                  isEncryptionOn(this.userData, getChannelId()) &&
+                  !isMessageEncrypted(message) &&
+                  message.length > 0
+                ) {
+                  a[1].content =
+                    PREFIX +
+                    encrypt(
+                      message,
+                      getOrCreateUserData(this.userData, getChannelId())
+                    );
+                }
+              }
+            );
           }
 
           /*
@@ -96,42 +117,15 @@ export default !window.ZeresPluginLibrary
            * Runs after every channel switch
            */
           onSwitch() {
-            /*
-             * Makes sure button is always injected
-             * Re-inject button when user changes chat/channel
-             */
             this.bootstrapUi();
+          }
 
-            // log("WebpackModules", WebpackModules.getByProps("DEFAULT_AVATARS"));
+          processTextInput(e) {
+            console.log("processTextInput", e);
+          }
 
-            // $(`div[role="textbox"]`).addEventListener(
-            //   "keydown",
-            //   (e) => {
-            //     if (e.which !== 13) return;
-            //     const message = $(
-            //       `div[role="textbox"] [data-slate-string="true"]`
-            //     ).textContent;
-
-            //     if (
-            //       isEncryptionOn(this.userData, getChannelId()) &&
-            //       !isMessageEncrypted(message) &&
-            //       message.length > 0
-            //     ) {
-            //       e.preventDefault();
-            //       e.stopPropagation();
-            //       $(`div[role="textbox"]`).focus();
-
-            //       $(`div[role="textbox"]`).sendkeys(
-            //         PREFIX +
-            //           encrypt(
-            //             message,
-            //             getOrCreateUserData(this.userData, getChannelId())
-            //           )
-            //       );
-            //     }
-            //   },
-            //   false
-            // );
+          processChannelTextAreaEditor(e) {
+            console.log("processTextInput", e);
           }
 
           //--------------------------------------------------------------------
@@ -174,35 +168,6 @@ export default !window.ZeresPluginLibrary
 
             this.components.encryptionButton.inject();
             channelState.state && decryptAllMessages(channelState);
-          }
-
-          sendMessage(message: string) {
-            var DiscordLocalStorageProxy = document.createElement("iframe");
-            DiscordLocalStorageProxy.style.display = "none";
-            DiscordLocalStorageProxy.id = "DiscordLocalStorageProxy";
-            document.body.appendChild(DiscordLocalStorageProxy);
-            var token =
-              DiscordLocalStorageProxy.contentWindow.localStorage.token.replace(
-                /"/g,
-                ""
-              );
-
-            $.ajax({
-              type: "POST",
-              url:
-                "https://discordapp.com/api/channels/" +
-                getChannelId() +
-                "/messages",
-              headers: {
-                authorization: token,
-              },
-              dataType: "json",
-              contentType: "application/json",
-              data: JSON.stringify({ content: message }),
-              error: (req, error, exception) => {
-                log("Message failed to send", req.responseText);
-              },
-            });
           }
 
           //--------------------------------------------------------------------

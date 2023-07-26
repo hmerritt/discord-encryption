@@ -136,6 +136,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^20.4.5":
+  version: 20.4.5
+  resolution: "@types/node@npm:20.4.5"
+  checksum: 36a0304a8dc346a1b2d2edac4c4633eecf70875793d61a5274d0df052d7a7af7a8e34f29884eac4fbd094c4f0201477dcb39c0ecd3307ca141688806538d1138
+  languageName: node
+  linkType: hard
+
 "@types/resolve@npm:1.20.2":
   version: 1.20.2
   resolution: "@types/resolve@npm:1.20.2"
@@ -406,6 +413,7 @@ __metadata:
     "@rollup/plugin-node-resolve": ^15.1.0
     "@rollup/plugin-typescript": ^11.1.2
     "@types/crypto-js": ^4.1.1
+    "@types/node": ^20.4.5
     crypto-js: ^4.1.1
     dayjs: ^1.11.9
     jquery: ^3.7.0
