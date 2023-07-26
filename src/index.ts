@@ -1,11 +1,11 @@
 import $ from "jquery";
 
 import {
-  Config,
-  PREFIX,
-  UserData,
   config,
+  Config,
+  Dummy,
   decryptAllMessages,
+  downloadRequiredLibraryIfMissing
   encrypt,
   getChannelId,
   getOrCreateUserData,
@@ -15,13 +15,17 @@ import {
   isEncryptionOn,
   isMessageEncrypted,
   log,
+  PREFIX,
   removeElements,
   styles,
+  UserData,
 } from "lib";
 
 import { encryptionButton, encryptionInput, updatePanel } from "lib/components";
+ 
+downloadRequiredLibraryIfMissing();
 
-export default (([Plugin, Api]) => {
+export default !window.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
   const plugin = (Plugin, Api) => {
     const {
       DiscordModules,
