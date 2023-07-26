@@ -1,8 +1,8 @@
-//META{ "name":"encryption", "website":"https://github.com/hmerritt/discord-encryption" }*//
 import $ from "jquery";
 
 import {
   Config,
+  PREFIX,
   UserData,
   config,
   decryptAllMessages,
@@ -13,6 +13,7 @@ import {
   inject,
   injectLog,
   isEncryptionOn,
+  isMessageEncrypted,
   log,
   removeElements,
   styles,
@@ -63,30 +64,7 @@ export class encryption {
     //  Inject styles
     inject("styles", "head", "append", this.components.styles);
 
-    //  Inject encryption button on start
-    this.components.encryptionButton.inject();
-
-    /*
-     * Makes sure button is always injected
-     * Re-inject button when user changes chat/channel
-     */
-    $(document).on(
-      "click",
-      `[aria-label="Servers"] > div, [aria-label="Channels"] li a, [aria-label="Direct Messages"] li`,
-      function () {
-        this.components.encryptionInput.toggleInput("hide");
-
-        const channelId = getChannelId() || "global";
-        const channelState = getOrCreateUserData(this.userData, channelId);
-        setTimeout(() => {
-          this.components.encryptionButton.inject();
-        }, 88);
-
-        // log("ENC TEST", encrypt("test", { state: true, password: "123" }));
-
-        channelState.state && decryptAllMessages(channelState);
-      }.bind(this)
-    );
+    this.bootstrapUi();
   }
 
   /*
@@ -95,12 +73,97 @@ export class encryption {
   stop() {
     //  Remove all elements that have been injected
     removeElements(`[${this.script.name}]`);
+  }
 
-    //  Unbind event listners
-    $(document).off(
-      "click",
-      `[aria-label="Servers"] > div, [aria-label="Channels"] li a, [aria-label="Direct Messages"] li`
-    );
+  onSwitch() {
+    /*
+     * Makes sure button is always injected
+     * Re-inject button when user changes chat/channel
+     */
+    this.bootstrapUi();
+
+    setTimeout(() => {
+      const $form = $(`div[role="textbox"]`);
+      $form.addEventListener(
+        "keydown",
+        (e) => {
+          if (e.which !== 13) return;
+          const message = $(
+            `div[role="textbox"] [data-slate-string="true"]`
+          ).textContent;
+
+          if (
+            isEncryptionOn(this.userData, getChannelId()) &&
+            !isMessageEncrypted(message) &&
+            message.length > 0
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.sendMessage(
+              PREFIX +
+                encrypt(
+                  message,
+                  getOrCreateUserData(this.userData, getChannelId())
+                )
+            );
+
+            // $("form textarea").val("");
+            // var textareaInstance = BDfunctionsDevilBro.getOwnerInstance({
+            //   node: el[0],
+            //   name: "ChannelTextAreaForm",
+            //   up: true,
+            // });
+            // textareaInstance.setState({
+            //   textValue: "",
+            // });
+          }
+        },
+        false
+      );
+    }, 88);
+  }
+
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
+
+  bootstrapUi() {
+    /*
+     * Inject UI elements. Decode messages.
+     */
+    this.components.encryptionInput.toggleInput("hide");
+
+    const channelId = getChannelId() || "global";
+    const channelState = getOrCreateUserData(this.userData, channelId);
+
+    this.components.encryptionButton.inject();
+    channelState.state && decryptAllMessages(channelState);
+  }
+
+  sendMessage(message: string) {
+    var DiscordLocalStorageProxy = document.createElement("iframe");
+    DiscordLocalStorageProxy.style.display = "none";
+    DiscordLocalStorageProxy.id = "DiscordLocalStorageProxy";
+    document.body.appendChild(DiscordLocalStorageProxy);
+    var token =
+      DiscordLocalStorageProxy.contentWindow.localStorage.token.replace(
+        /"/g,
+        ""
+      );
+
+    $.ajax({
+      type: "POST",
+      url:
+        "https://discordapp.com/api/channels/" + getChannelId() + "/messages",
+      headers: {
+        authorization: token,
+      },
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({ content: message }),
+      error: (req, error, exception) => {
+        log("Message failed to send", req.responseText);
+      },
+    });
   }
 
   //--------------------------------------------------------------------

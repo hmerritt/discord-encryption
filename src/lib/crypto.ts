@@ -4,7 +4,7 @@ import crypto from "crypto-js";
 import { log } from "./log";
 import { UserData } from "./config";
 
-const PREFIX = "#!aes/";
+export const PREFIX = "#!aes/";
 
 export const encrypt = (msg: string, channelData: UserData["global"]) => {
   if (isMessageEncrypted(msg)) return msg;
