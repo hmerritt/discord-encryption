@@ -47,6 +47,7 @@ export default !window.ZeresPluginLibrary
            */
           constructor() {
             super();
+            injectLog();
 
             //  Script metadata
             this.script = { ...config };
