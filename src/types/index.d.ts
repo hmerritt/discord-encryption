@@ -20,9 +20,11 @@ type BdApiPartial = {
 
 declare global {
   var BdApi: BdApiPartial;
+  var ZeresPluginLibrary: any;
 
   interface Window {
     BdApi: BdApiPartial;
+    ZeresPluginLibrary: any;
   }
 }
 

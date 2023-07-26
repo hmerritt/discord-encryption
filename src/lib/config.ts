@@ -1,7 +1,14 @@
 export const config = {
   name: "encryptionPlugin",
+  nameTitle: "Encryption",
+  description: "Message encryption using AES-256",
+  author: {
+    name: "Harry Merritt",
+    github_username: "hmerritt",
+    twitter_username: "hmrrtt",
+  },
   version: {
-    current: "1.0.0",
+    current: "2.0.0",
     latest: "",
     update: false,
     ignoreUpdate: false,

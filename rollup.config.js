@@ -8,13 +8,13 @@ export default {
 	input: 'src/index.ts',
 	output: {
 		file: 'encryption.plugin.js',
-		format: 'cjs', // cjs | iife | umd
+		format: 'cjs', // cjs | es
 		sourcemap: false
 	},
 	plugins: [
 		typescript(),
-		resolve(), // tells Rollup how to find date-fns in node_modules
-		commonjs(), // converts date-fns to ES modules
+		resolve(),
+		commonjs(),
 	],
 	define: {
 		"process.env": {},

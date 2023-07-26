@@ -13,8 +13,8 @@ export const getUserData = (): UserData => {
   };
 
   try {
-    if (typeof window?.BdApi?.Data !== "undefined") {
-      const getUserData = window?.BdApi?.Data.load(config.name, config.name);
+    if (typeof window?.BdApi?.getData !== "undefined") {
+      const getUserData = window?.BdApi?.getData(config.name, config.name);
       if (getUserData?.global) return getUserData;
     }
 
@@ -29,10 +29,10 @@ export const getUserData = (): UserData => {
   return defaultUserData;
 };
 
-export const saveUserData = (userData: any) => {
+export const saveUserData = (userData: UserData) => {
   try {
-    if (typeof window?.BdApi?.Data !== "undefined") {
-      return window?.BdApi?.Data.save(
+    if (typeof window?.BdApi?.setData !== "undefined") {
+      return window?.BdApi?.setData(
         config.name,
         config.name,
         JSON.stringify(userData)
