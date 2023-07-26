@@ -10,9 +10,8 @@ Download the `encryption.plugin.js` from the releases [here](https://github.com/
 
 Adds ability to encrypt / decrypt messages on discord using a set password
 
-- Utilizes AES-256 encryption via the [stanford javascript crypto library](https://github.com/bitwiseshiftleft/sjcl)
-- Per-chat PSK
-- PSK saved as md5 (cleartext passwords not present in localStorage)
+- Utilizes AES-256 encryption via the [crypto-js library](https://www.npmjs.com/package/crypto-js)
+- Passwords are saved per-chat
 - Messages are decrypted the moment they are receved with little to no delay
 - Encrypted messages appear as green
 - Messages that fail to be decrypted (most likely due to an incorrect password) display a message and appear as red
@@ -45,11 +44,11 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 
 ### Encrypted Message
 
-![Context](https://i.imgur.com/s8CYNJK.png)
+![Context](https://imgur.com/xaZ19kI.png)
 
 ### Decrypted Message
 
-![Context](https://i.imgur.com/CCqW5aj.png)
+![Context](https://imgur.com/bL9foML.png)
 
 ## Development
 
