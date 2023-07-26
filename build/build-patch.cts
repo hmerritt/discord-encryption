@@ -2,6 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const pathfs = require('path');
 const prependFile = require('prepend-file');
+const { config } = require('../src/lib/config');
 
 const isDev = process.argv?.[2] === 'dev';
 const pluginOutputFile = pathfs.join(__dirname, '../', 'encryption.plugin.js');
@@ -12,11 +13,13 @@ const main = async () => {
 
 	console.log(`> Adding META data to plugin output file`);
 	await prependFile(pluginOutputFile, `/**
- * @name Encryption
- * @description Message encryption using AES-256
- * @author hmerritt
- * @website https://github.com/hmerritt/discord-encryption
- * @source https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js
+ * @name ${config.nameTitle}
+ * @version ${config.version.current}
+ * @description ${config.description}
+ * @author ${config.author.github_username}
+ * @website ${config.link.repository}
+ * @source ${config.link.source}
+ * @updateUrl ${config.link.source}
  */
 `);
 

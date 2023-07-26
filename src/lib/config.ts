@@ -16,7 +16,7 @@ export const config = {
   link: {
     repository: "https://github.com/hmerritt/discord-encryption",
     source:
-      "https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js",
+      "https://github.com/hmerritt/discord-encryption/releases/latest/download/encryption.plugin.js",
     sourceConfig:
       "https://raw.githubusercontent.com/hmerritt/discord-encryption/master/src/lib/config.ts",
   },

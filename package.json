@@ -4,8 +4,8 @@
   "type": "module",
   "description": "An experimental encryption solution for Discord",
   "scripts": {
-    "build": "rollup -c && node build/build-patch.cjs",
-    "build:dev": "rollup -c && node build/build-patch.cjs dev"
+    "build": "rollup -c && tsx ./build/build-patch.cts",
+    "build:dev": "rollup -c && tsx ./build/build-patch.cts dev"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
@@ -21,6 +21,7 @@
     "prepend-file": "^2.0.1",
     "rollup": "^3.26.3",
     "tslib": "^2.6.1",
+    "tsx": "^3.12.7",
     "typescript": "^5.1.6"
   },
   "repository": {
