@@ -1,5 +1,3 @@
-import $ from "jquery";
-
 import {
   config,
   Config,
@@ -86,7 +84,6 @@ export default !window.ZeresPluginLibrary
               DiscordModules.MessageActions,
               "sendMessage",
               (t, a) => {
-                console.log("PATCH", t, a);
                 let message = a[1].content;
 
                 if (
@@ -94,12 +91,14 @@ export default !window.ZeresPluginLibrary
                   !isMessageEncrypted(message) &&
                   message.length > 0
                 ) {
-                  a[1].content =
+                  const enc =
                     PREFIX +
                     encrypt(
                       message,
                       getOrCreateUserData(this.userData, getChannelId())
                     );
+
+                  a[1].content = enc;
                 }
               }
             );
@@ -107,9 +106,16 @@ export default !window.ZeresPluginLibrary
             Patcher.after(
               DiscordModules.MessageActions,
               "receiveMessage",
-              () => {
+              function () {
                 this.bootstrapUi();
-              }
+
+                setTimeout(
+                  function () {
+                    this.bootstrapUi();
+                  }.bind(this),
+                  1000
+                );
+              }.bind(this)
             );
           }
 
@@ -126,14 +132,13 @@ export default !window.ZeresPluginLibrary
            */
           onSwitch() {
             this.bootstrapUi();
-          }
 
-          processTextInput(e) {
-            console.log("processTextInput", e);
-          }
-
-          processChannelTextAreaEditor(e) {
-            console.log("processTextInput", e);
+            setTimeout(
+              function () {
+                this.bootstrapUi();
+              }.bind(this),
+              1000
+            );
           }
 
           //--------------------------------------------------------------------

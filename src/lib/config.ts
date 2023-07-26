@@ -18,7 +18,7 @@ export const config = {
     source:
       "https://raw.githubusercontent.com/hmerritt/discord-encryption/master/encryption.plugin.js",
     sourceConfig:
-      "https://raw.githubusercontent.com/hmerritt/discord-encryption/dev/2.0.0/src/lib/config.ts",
+      "https://raw.githubusercontent.com/hmerritt/discord-encryption/master/src/lib/config.ts",
   },
 };
 

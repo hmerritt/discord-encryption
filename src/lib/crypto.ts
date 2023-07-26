@@ -1,23 +1,32 @@
 import $ from "jquery";
 import crypto from "crypto-js";
 
-import { log } from "./log";
 import { UserData } from "./config";
 
 export const PREFIX = "#!aes/";
 
 export const encrypt = (msg: string, channelData: UserData["global"]) => {
   if (isMessageEncrypted(msg)) return msg;
-  return crypto.AES.encrypt(msg, channelData.password).toString(
-    crypto.format.Hex
-  );
+
+  const key = crypto.SHA512(channelData.password);
+  const iv = crypto.enc.Hex.parse("00000000000000000000000000000000");
+
+  return crypto.AES.encrypt(msg, key, {
+    iv: iv,
+    padding: crypto.pad.Iso10126,
+  }).toString();
 };
 
 export const decrypt = (msg: string, channelData: UserData["global"]) => {
   if (isMessageEncrypted(msg)) msg = msg.substring(6);
-  return crypto.AES.decrypt(msg, channelData.password).toString(
-    crypto.enc.Utf8
-  );
+
+  const key = crypto.SHA512(channelData.password);
+  const iv = crypto.enc.Hex.parse("00000000000000000000000000000000");
+
+  return crypto.AES.decrypt(msg, key, {
+    iv: iv,
+    padding: crypto.pad.Iso10126,
+  }).toString(crypto.enc.Utf8);
 };
 
 export const isMessageEncrypted = (msg: string) => {
@@ -41,7 +50,7 @@ export const decryptAllMessages = (channelData: UserData["global"]) => {
       const decrypted = decrypt(message, channelData);
       if (!decrypted) throw "decryption failed";
 
-      $(this).html(decrypt(message, channelData)).addClass("decrypted");
+      $(this).html(decrypted).addClass("decrypted");
     } catch (e) {
       $(this)
         .html("(failed to decrypt. most likely the wrong password)")
