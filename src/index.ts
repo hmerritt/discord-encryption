@@ -103,6 +103,14 @@ export default !window.ZeresPluginLibrary
                 }
               }
             );
+
+            Patcher.after(
+              DiscordModules.MessageActions,
+              "receiveMessage",
+              () => {
+                this.bootstrapUi();
+              }
+            );
           }
 
           /*
