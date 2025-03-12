@@ -53,15 +53,9 @@ export const isEncryptionOn = (
   userData: any,
   channelId = getChannelId() || ""
 ) => {
-  log(userData);
-  let globalState = userData?.global?.state;
-  let chatState = userData?.[channelId] ? userData?.[channelId]?.state : false;
-
-  if (globalState || chatState) {
-    return true;
-  }
-
-  return false;
+  const globalState = userData?.global?.state;
+  const chatState = userData?.[channelId]?.state;
+  return globalState || chatState ? true : false;
 };
 
 export const getEncryptionPassword = (

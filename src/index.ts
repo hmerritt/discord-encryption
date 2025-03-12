@@ -16,7 +16,6 @@ import {
   PREFIX,
   removeElements,
   styles,
-  UserData,
 } from "lib";
 
 import { encryptionButton, encryptionInput, updatePanel } from "lib/components";
@@ -39,7 +38,6 @@ export default !window.ZeresPluginLibrary
 
         return class Encryption extends Plugin {
           script: Config;
-          userData: UserData;
           components: any;
 
           /*
@@ -51,9 +49,6 @@ export default !window.ZeresPluginLibrary
 
             //  Script metadata
             this.script = { ...config };
-
-            //  Load user data from local storage
-            this.userData = getUserData();
 
             //  Stores component data
             this.components = {};
@@ -88,7 +83,7 @@ export default !window.ZeresPluginLibrary
                 let message = a[1].content;
 
                 if (
-                  isEncryptionOn(this.userData, getChannelId()) &&
+                  isEncryptionOn(getUserData(), getChannelId()) &&
                   !isMessageEncrypted(message) &&
                   message.length > 0
                 ) {
@@ -96,7 +91,7 @@ export default !window.ZeresPluginLibrary
                     PREFIX +
                     encrypt(
                       message,
-                      getOrCreateUserData(this.userData, getChannelId())
+                      getOrCreateUserData(getUserData(), getChannelId())
                     );
 
                   a[1].content = enc;
@@ -159,15 +154,15 @@ export default !window.ZeresPluginLibrary
              */
             this.components.updatePanel = updatePanel(
               this.script,
-              this.userData
+              getUserData()
             );
             this.components.encryptionButton = encryptionButton(
               this.script,
-              this.userData
+              getUserData()
             );
             this.components.encryptionInput = encryptionInput(
               this.script,
-              this.userData
+              getUserData()
             );
           }
 
@@ -178,7 +173,7 @@ export default !window.ZeresPluginLibrary
             this.components.encryptionInput.toggleInput("hide");
 
             const channelId = getChannelId() || "global";
-            const channelState = getOrCreateUserData(this.userData, channelId);
+            const channelState = getOrCreateUserData(getUserData(), channelId);
 
             this.components.encryptionButton.inject();
             channelState.state && decryptAllMessages(channelState);
