@@ -71,7 +71,7 @@ export const encryptionButton = (script: Config, userData: UserData) => ({
   inject: () =>
     inject(
       componentName,
-      `button[aria-label="Upload a file or send invites"]`,
+      `[class^=attachWrapper] > button`,
       "after",
       html(script, userData)
     ),
