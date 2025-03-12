@@ -8,7 +8,7 @@ export const config = {
     twitter_username: "hmrrtt",
   },
   version: {
-    current: "2.0.0",
+    current: "2.1.0",
     latest: "",
     update: false,
     ignoreUpdate: false,

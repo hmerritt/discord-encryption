@@ -54,7 +54,7 @@ const toggleState = (script: Config, userData: UserData) => {
   const channelId = getChannelId() || "global";
   getOrCreateUserData(userData, channelId);
 
-  if ($button.attr("state") === "true") {
+  if (isEncryptionOn(userData, channelId)) {
     $button.attr("state", "false");
     userData[channelId].state = false;
   } else {
@@ -71,7 +71,7 @@ export const encryptionButton = (script: Config, userData: UserData) => ({
   inject: () =>
     inject(
       componentName,
-      `button[aria-label="Upload a file or send invites"]`,
+      `[class^=attachWrapper] > button`,
       "after",
       html(script, userData)
     ),
