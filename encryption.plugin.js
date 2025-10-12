@@ -18925,7 +18925,7 @@ const toggleState = (script, userData) => {
 const encryptionButton = (script, userData) => ({
     html: () => html$1(script, userData),
     close: (delay = 0) => close$1(script, userData, delay),
-    inject: () => inject(componentName$1, `[class^=attachWrapper] > button`, "after", html$1(script, userData)),
+    inject: () => inject(componentName$1, `[class^=attachWrapper] > [role="button"]`, "after", html$1(script, userData)),
     //
     toggleState: () => toggleState(script, userData),
 });

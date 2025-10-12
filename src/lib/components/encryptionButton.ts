@@ -71,7 +71,7 @@ export const encryptionButton = (script: Config, userData: UserData) => ({
   inject: () =>
     inject(
       componentName,
-      `[class^=attachWrapper] > button`,
+      `[class^=attachWrapper] > [role="button"]`,
       "after",
       html(script, userData)
     ),
