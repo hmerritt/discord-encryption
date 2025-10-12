@@ -39,6 +39,7 @@ export default !window.ZeresPluginLibrary
         return class Encryption extends Plugin {
           script: Config;
           components: any;
+          messageObserver: MutationObserver | null;
 
           /*
            * Define global variables
@@ -102,23 +103,73 @@ export default !window.ZeresPluginLibrary
             Patcher.after(
               DiscordModules.MessageActions,
               "receiveMessage",
-              function () {
-                this.bootstrapUi();
-
-                setTimeout(
-                  function () {
-                    this.bootstrapUi();
-                  }.bind(this),
-                  1000
-                );
+              function (thisObject, args, returnValue) {
+                // Decrypt the incoming message immediately
+                const channelId = getChannelId() || "global";
+                const channelState = getOrCreateUserData(getUserData(), channelId);
+                
+                if (channelState.state) {
+                  // Use a short timeout to ensure message is in DOM
+                  setTimeout(() => {
+                    decryptAllMessages(channelState);
+                  }, 10);
+                }
               }.bind(this)
             );
+
+            // Add MutationObserver to watch for new messages in real-time
+            this.setupMessageObserver();
+          }
+
+          /*
+           * Sets up a MutationObserver to decrypt messages as they appear in DOM
+           */
+          setupMessageObserver() {
+            // Find the chat messages container
+            const findChatContainer = () => {
+              return document.querySelector('[class*="messagesWrapper"]') || 
+                     document.querySelector('[data-list-id="chat-messages"]') ||
+                     document.querySelector('[class*="scrollerInner"]');
+            };
+
+            const startObserving = () => {
+              const chatContainer = findChatContainer();
+              
+              if (chatContainer && !this.messageObserver) {
+                this.messageObserver = new MutationObserver(() => {
+                  const channelId = getChannelId() || "global";
+                  const channelState = getOrCreateUserData(getUserData(), channelId);
+                  
+                  if (channelState.state) {
+                    decryptAllMessages(channelState);
+                  }
+                });
+
+                this.messageObserver.observe(chatContainer, { 
+                  childList: true, 
+                  subtree: true 
+                });
+                
+                log("Message observer started");
+              } else if (!chatContainer) {
+                // Retry if container not found yet
+                setTimeout(startObserving, 500);
+              }
+            };
+
+            startObserving();
           }
 
           /*
            * Runs when plugin has been stopped
            */
           stop() {
+            //  Disconnect the message observer
+            if (this.messageObserver) {
+              this.messageObserver.disconnect();
+              this.messageObserver = null;
+            }
+
             //  Remove all elements that have been injected
             removeElements(`[${this.script.name}]`);
           }
@@ -135,6 +186,13 @@ export default !window.ZeresPluginLibrary
               }.bind(this),
               1000
             );
+
+            // Restart observer for new channel
+            if (this.messageObserver) {
+              this.messageObserver.disconnect();
+              this.messageObserver = null;
+            }
+            this.setupMessageObserver();
           }
 
           //--------------------------------------------------------------------
