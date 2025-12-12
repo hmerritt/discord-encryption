@@ -13,8 +13,8 @@ export const getUserData = (): UserData => {
 	};
 
 	try {
-		if (typeof window?.BdApi?.getData !== "undefined") {
-			const getUserData = window?.BdApi?.getData(config.name, config.name);
+		if (typeof window?.BdApi?.Data?.load !== "undefined") {
+			const getUserData = window?.BdApi.Data.load(config.name, config.name);
 			return JSON.parse(getUserData);
 		}
 
@@ -31,8 +31,8 @@ export const getUserData = (): UserData => {
 
 export const saveUserData = (userData: UserData) => {
 	try {
-		if (typeof window?.BdApi?.setData !== "undefined") {
-			return window?.BdApi?.setData(
+		if (typeof window?.BdApi?.Data?.save !== "undefined") {
+			return window?.BdApi.Data.save(
 				config.name,
 				config.name,
 				JSON.stringify(userData)
