@@ -33,7 +33,7 @@ const html = (script: Config, userData: UserData) => {
 		$(`[role="textbox"]`).focus();
 	};
 
-	//  bind right click to adding encryption input
+	// Bind right click to adding encryption input
 	$button.oncontextmenu = (evt: any) => {
 		evt.preventDefault();
 		encryptionInput(script, userData).toggleInput("");
@@ -75,6 +75,5 @@ export const encryptionButton = (script: Config, userData: UserData) => ({
 			"after",
 			html(script, userData)
 		),
-	//
 	toggleState: () => toggleState(script, userData)
 });

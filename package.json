@@ -9,7 +9,6 @@
 		"update": "yarn upgrade-interactive"
 	},
 	"dependencies": {
-		"crypto-js": "^4.2.0",
 		"dayjs": "^1.11.13",
 		"jquery": "^3.7.1"
 	},
@@ -18,7 +17,6 @@
 		"@rollup/plugin-node-resolve": "^16.0.1",
 		"@rollup/plugin-typescript": "^12.1.2",
 		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
-		"@types/crypto-js": "^4.2.2",
 		"@types/node": "^20.17.24",
 		"prepend-file": "^2.0.1",
 		"prettier": "^3.7.4",
