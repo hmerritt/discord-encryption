@@ -46,10 +46,10 @@ export default !window.ZeresPluginLibrary
 						super();
 						injectLog();
 
-						//  Script metadata
+						// Script metadata
 						this.script = { ...config };
 
-						//  Stores component data
+						// Stores component data
 						this.components = {};
 					}
 
@@ -59,10 +59,10 @@ export default !window.ZeresPluginLibrary
 					load() {
 						injectLog();
 
-						//  Initialize DOM components
+						// Initialize DOM components
 						this.initializeComponents();
 
-						//  Check for new version
+						// Check for new version
 						this.checkForUpdate();
 					}
 
@@ -70,10 +70,10 @@ export default !window.ZeresPluginLibrary
 					 * Runs each time plugin starts (after load on initial start)
 					 */
 					start() {
-						//  Inject styles
+						// Inject styles
 						inject("styles", "head", "append", this.components.styles);
 
-						this.bootstrapUi();
+						this.bootstrapUiWithTimeouts();
 
 						Patcher.instead(
 							DiscordModules.MessageActions,
@@ -111,7 +111,7 @@ export default !window.ZeresPluginLibrary
 					 * Runs when plugin has been stopped
 					 */
 					stop() {
-						//  Remove all elements that have been injected
+						// Remove all elements that have been injected
 						removeElements(`[${this.script.name}]`);
 						Patcher.unpatchAll();
 					}
@@ -169,7 +169,7 @@ export default !window.ZeresPluginLibrary
 					}
 
 					bootstrapUiWithTimeouts() {
-						//  Bootstrap UI optimistically (with fallbacks incase messages haven't rendered yet)
+						// Bootstrap UI optimistically (with fallbacks incase messages haven't rendered yet)
 						this.bootstrapUi();
 
 						setTimeout(
@@ -194,39 +194,39 @@ export default !window.ZeresPluginLibrary
 					 * Checks GitHub for a newer version of the script
 					 */
 					async checkForUpdate() {
-						//  Skip checking if user has previously chosen to ignore the update
+						// Skip checking if user has previously chosen to ignore the update
 						if (this.script.version.ignoreUpdate) return;
 						log("Checking for updates...");
 
 						try {
-							//  Get latest script from GitHub
+							// Get latest script from GitHub
 							const res = await (
 								await fetch(this.script.link.sourceConfig)
 							).text();
 
-							//  Extract latest version from script
+							// Extract latest version from script
 							const latestMatch = res.match(/(\d.\d.\d)/);
 							const latest = latestMatch == null ? "" : latestMatch[0];
 
-							//  Update global var with latest version
+							// Update global var with latest version
 							this.script.version.latest = latest;
 
-							//  Make script versions a number (remove '.')
+							// Make script versions a number (remove '.')
 							const currentVersion = this.script.version.current.replace(
 								/\./g,
 								""
 							);
 							const latestVersion = latest.replace(/\./g, "");
 
-							//  Compare current and latest version
+							// Compare current and latest version
 							if (currentVersion < latestVersion) {
-								//  Update is available
+								// Update is available
 								this.script.version.update = true;
 								log(
 									`An update is available! [${currentVersion} => ${latestVersion}]`
 								);
 
-								//  add update pop-up to ui
+								// add update pop-up to ui
 								this.components.updatePanel.inject();
 							}
 						} catch (err) {

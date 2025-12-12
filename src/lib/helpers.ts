@@ -51,9 +51,9 @@ export const getOrCreateUserData = (userData: UserData, channelId = "global") =>
  * Inject content into the page. Prevents multiple injections.
  */
 export const inject = (name, querySelector, how, content) => {
-	//  Check if element has already been injected
+	// Check if element has already been injected
 	if (!elementExists(`[${config.name}=${name}]`)) {
-		//  Decide how to add the content into the page
+		// Decide how to add the content into the page
 		switch (how) {
 			case "append":
 				$(querySelector).append(content);
