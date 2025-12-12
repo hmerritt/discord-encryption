@@ -1,0 +1,17 @@
+{
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.formatOnSave": true,
+	"eslint.workingDirectories": ["src"],
+	"files.autoSave": "onFocusChange",
+	"files.exclude": {
+		"**/.git": true
+	},
+	"javascript.validate.enable": true,
+	"scss.format.spaceAroundSelectorSeparator": true,
+	"search.useIgnoreFiles": true
+}
