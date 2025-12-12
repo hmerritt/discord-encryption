@@ -40,29 +40,22 @@ export const isMessageEncrypted = (msg: string) => {
 
 export const decryptAllMessages = (channelData: UserData["global"]) => {
 	// Loop all messages
-	const markup = selectAllFirstMatch([
-		`div[class*="messageContent"]`,
-		`div[id*="message-content"]`,
-		// Not working, maybe fix later:
-		`[id*="message-content"]`,
-		`[aria-roledescription="Message"] [class*="messageContent"]`,
-		`[data-list-id="chat-messages"]`,
-		`[class*="scrollerInner"]`
-	]);
+	let markup = $(`div[class*="messageContent"]`);
+	if (!markup || markup.length === 0) markup = $(`div[id*="message-content"]`);
 
-	for (const item of Array.from(markup)) {
+	$(markup).each(function () {
 		try {
-			const message = item.textContent?.trim();
+			const message = $(this).text().trim();
 			if (!isMessageEncrypted(message)) return;
 
 			const decrypted = decrypt(message, channelData);
 			if (!decrypted) throw "decryption failed";
 
-			item.innerHTML = decrypted;
-			item.classList.add("decrypted");
+			$(this).html(decrypted).addClass("decrypted");
 		} catch (e) {
-			item.innerHTML = "(failed to decrypt. most likely the wrong password)";
-			item.classList.add("not-decrypted");
+			$(this)
+				.html("(failed to decrypt. most likely the wrong password)")
+				.addClass("not-decrypted");
 		}
-	}
+	});
 };
