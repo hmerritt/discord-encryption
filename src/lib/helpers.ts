@@ -89,6 +89,18 @@ export const removeElements = (querySelector) => {
 	$(querySelector).remove();
 };
 
+export const selectAllFirstMatch = <E extends Element>(selectors: string[]) => {
+	let markup: any;
+	for (const selector of selectors) {
+		const $el = document.querySelectorAll(selector);
+		if ($el?.length) {
+			markup = $el;
+			break;
+		}
+	}
+	return markup as NodeListOf<E>;
+};
+
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------
 

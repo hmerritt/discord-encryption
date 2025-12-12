@@ -2,6 +2,7 @@ import crypto from "crypto-js";
 import $ from "jquery";
 
 import { UserData } from "./config";
+import { selectAllFirstMatch } from "./helpers";
 
 export const PREFIX = "#!aes/";
 
@@ -39,22 +40,29 @@ export const isMessageEncrypted = (msg: string) => {
 
 export const decryptAllMessages = (channelData: UserData["global"]) => {
 	// Loop all messages
-	let markup = $(`div[class*="messageContent"]`);
-	if (markup.length == 0) markup = $(`div[id*="message-content"]`);
+	const markup = selectAllFirstMatch([
+		`div[class*="messageContent"]`,
+		`div[id*="message-content"]`,
+		// Not working, maybe fix later:
+		`[id*="message-content"]`,
+		`[aria-roledescription="Message"] [class*="messageContent"]`,
+		`[data-list-id="chat-messages"]`,
+		`[class*="scrollerInner"]`
+	]);
 
-	$(markup).each(function () {
+	for (const item of Array.from(markup)) {
 		try {
-			const message = $(this).text().trim();
+			const message = item.textContent?.trim();
 			if (!isMessageEncrypted(message)) return;
 
 			const decrypted = decrypt(message, channelData);
 			if (!decrypted) throw "decryption failed";
 
-			$(this).html(decrypted).addClass("decrypted");
+			item.innerHTML = decrypted;
+			item.classList.add("decrypted");
 		} catch (e) {
-			$(this)
-				.html("(failed to decrypt. most likely the wrong password)")
-				.addClass("not-decrypted");
+			item.innerHTML = "(failed to decrypt. most likely the wrong password)";
+			item.classList.add("not-decrypted");
 		}
-	});
+	}
 };
