@@ -101,7 +101,7 @@ export class Dummy {
 export const downloadRequiredLibraryIfMissing = () => {
 	if (window.ZeresPluginLibrary) return;
 
-	window.BdApi.showConfirmationModal(
+	window.BdApi.UI.showConfirmationModal(
 		"Library Missing",
 		`The library plugin needed for ${config.nameTitle} is missing. Please click Download Now to install it.`,
 		{
