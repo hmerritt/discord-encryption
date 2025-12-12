@@ -18925,7 +18925,7 @@ const toggleState = (script, userData) => {
 const encryptionButton = (script, userData) => ({
     html: () => html$1(script, userData),
     close: (delay = 0) => close$1(script, userData, delay),
-    inject: () => inject(componentName$1, `[class^=attachWrapper] > button`, "after", html$1(script, userData)),
+    inject: () => inject(componentName$1, `[class^=attachWrapper] > [role="button"]`, "after", html$1(script, userData)),
     //
     toggleState: () => toggleState(script, userData),
 });
@@ -19009,17 +19009,62 @@ var index = !window.ZeresPluginLibrary
                             a[1].content = enc;
                         }
                     });
-                    Patcher.after(DiscordModules.MessageActions, "receiveMessage", function () {
-                        this.bootstrapUi();
-                        setTimeout(function () {
-                            this.bootstrapUi();
-                        }.bind(this), 1000);
+                    Patcher.after(DiscordModules.MessageActions, "receiveMessage", function (thisObject, args, returnValue) {
+                        // Decrypt the incoming message immediately
+                        const channelId = getChannelId() || "global";
+                        const channelState = getOrCreateUserData(getUserData(), channelId);
+                        if (channelState.state) {
+                            // Use a short timeout to ensure message is in DOM
+                            setTimeout(() => {
+                                decryptAllMessages(channelState);
+                            }, 10);
+                        }
                     }.bind(this));
+                    // Add MutationObserver to watch for new messages in real-time
+                    this.setupMessageObserver();
+                }
+                /*
+                 * Sets up a MutationObserver to decrypt messages as they appear in DOM
+                 */
+                setupMessageObserver() {
+                    // Find the chat messages container
+                    const findChatContainer = () => {
+                        return document.querySelector('[class*="messagesWrapper"]') ||
+                            document.querySelector('[data-list-id="chat-messages"]') ||
+                            document.querySelector('[class*="scrollerInner"]');
+                    };
+                    const startObserving = () => {
+                        const chatContainer = findChatContainer();
+                        if (chatContainer && !this.messageObserver) {
+                            this.messageObserver = new MutationObserver(() => {
+                                const channelId = getChannelId() || "global";
+                                const channelState = getOrCreateUserData(getUserData(), channelId);
+                                if (channelState.state) {
+                                    decryptAllMessages(channelState);
+                                }
+                            });
+                            this.messageObserver.observe(chatContainer, {
+                                childList: true,
+                                subtree: true
+                            });
+                            log("Message observer started");
+                        }
+                        else if (!chatContainer) {
+                            // Retry if container not found yet
+                            setTimeout(startObserving, 500);
+                        }
+                    };
+                    startObserving();
                 }
                 /*
                  * Runs when plugin has been stopped
                  */
                 stop() {
+                    //  Disconnect the message observer
+                    if (this.messageObserver) {
+                        this.messageObserver.disconnect();
+                        this.messageObserver = null;
+                    }
                     //  Remove all elements that have been injected
                     removeElements(`[${this.script.name}]`);
                 }
@@ -19031,6 +19076,12 @@ var index = !window.ZeresPluginLibrary
                     setTimeout(function () {
                         this.bootstrapUi();
                     }.bind(this), 1000);
+                    // Restart observer for new channel
+                    if (this.messageObserver) {
+                        this.messageObserver.disconnect();
+                        this.messageObserver = null;
+                    }
+                    this.setupMessageObserver();
                 }
                 //--------------------------------------------------------------------
                 //--------------------------------------------------------------------
