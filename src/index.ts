@@ -38,7 +38,6 @@ export default !window.ZeresPluginLibrary
 				return class Encryption extends Plugin {
 					script: Config;
 					components: any;
-					messageObserver: MutationObserver | null;
 
 					/*
 					 * Define global variables
@@ -76,29 +75,26 @@ export default !window.ZeresPluginLibrary
 
 						this.bootstrapUi();
 
-						Patcher.before(
+						Patcher.instead(
 							DiscordModules.MessageActions,
 							"sendMessage",
-							(t, a) => {
-								let message = a[1].content;
+							async (thisObject, args, originalFunction) => {
+								let message = args[1].content;
 
 								if (
 									isEncryptionOn(getUserData(), getChannelId()) &&
 									!isMessageEncrypted(message) &&
-									message.length > 0
+									message?.length > 0
 								) {
-									const enc =
-										PREFIX +
-										encrypt(
-											message,
-											getOrCreateUserData(
-												getUserData(),
-												getChannelId()
-											)
-										);
-
-									a[1].content = enc;
+									const channelPass = getOrCreateUserData(
+										getUserData(),
+										getChannelId()
+									).password;
+									const enc = await encrypt(message, channelPass);
+									args[1].content = PREFIX + enc;
 								}
+
+								return originalFunction.apply(thisObject, args);
 							}
 						);
 
@@ -106,105 +102,25 @@ export default !window.ZeresPluginLibrary
 							DiscordModules.MessageActions,
 							"receiveMessage",
 							function (thisObject, args, returnValue) {
-								// Decrypt the incoming message immediately
-								const channelId = getChannelId() || "global";
-								const channelState = getOrCreateUserData(
-									getUserData(),
-									channelId
-								);
-
-								if (channelState.state) {
-									// Use a short timeout to ensure message is in DOM
-									setTimeout(() => {
-										decryptAllMessages(channelState);
-									}, 10);
-								}
+								this.bootstrapUiWithTimeouts();
 							}.bind(this)
 						);
-
-						// Add MutationObserver to watch for new messages in real-time
-						this.setupMessageObserver();
-					}
-
-					/*
-					 * Sets up a MutationObserver to decrypt messages as they appear in DOM
-					 */
-					setupMessageObserver() {
-						// Find the chat messages container
-						const findChatContainer = () => {
-							return (
-								document.querySelector('[class*="messagesWrapper"]') ||
-								document.querySelector(
-									'[data-list-id="chat-messages"]'
-								) ||
-								document.querySelector('[class*="scrollerInner"]')
-							);
-						};
-
-						const startObserving = () => {
-							const chatContainer = findChatContainer();
-
-							if (chatContainer && !this.messageObserver) {
-								this.messageObserver = new MutationObserver(() => {
-									const channelId = getChannelId() || "global";
-									const channelState = getOrCreateUserData(
-										getUserData(),
-										channelId
-									);
-
-									if (channelState.state) {
-										decryptAllMessages(channelState);
-									}
-								});
-
-								this.messageObserver.observe(chatContainer, {
-									childList: true,
-									subtree: true
-								});
-
-								log("Message observer started");
-							} else if (!chatContainer) {
-								// Retry if container not found yet
-								setTimeout(startObserving, 500);
-							}
-						};
-
-						startObserving();
 					}
 
 					/*
 					 * Runs when plugin has been stopped
 					 */
 					stop() {
-						//  Disconnect the message observer
-						if (this.messageObserver) {
-							this.messageObserver.disconnect();
-							this.messageObserver = null;
-						}
-
 						//  Remove all elements that have been injected
 						removeElements(`[${this.script.name}]`);
+						Patcher.unpatchAll();
 					}
 
 					/**
 					 * Runs after every channel switch
 					 */
 					onSwitch() {
-						this.bootstrapUi();
-
-						setTimeout(
-							function () {
-								this.bootstrapUi();
-							}.bind(this),
-							1000
-						);
-
-						// Restart observer for new channel
-						if (this.messageObserver) {
-							this.messageObserver.disconnect();
-							this.messageObserver = null;
-						}
-						this.setupMessageObserver();
+						this.bootstrapUiWithTimeouts();
 					}
 
 					//--------------------------------------------------------------------
@@ -215,9 +131,9 @@ export default !window.ZeresPluginLibrary
 						 * CSS
 						 */
 						this.components.styles = `<style ${this.script.name}="styles">
-		    ${styles}
-      </style>
-    `;
+								${styles}
+						</style>
+						`;
 
 						/*
 						 * Register components
@@ -250,6 +166,25 @@ export default !window.ZeresPluginLibrary
 
 						this.components.encryptionButton.inject();
 						channelState.state && decryptAllMessages(channelState);
+					}
+
+					bootstrapUiWithTimeouts() {
+						//  Bootstrap UI optimistically (with fallbacks incase messages haven't rendered yet)
+						this.bootstrapUi();
+
+						setTimeout(
+							function () {
+								this.bootstrapUi();
+							}.bind(this),
+							100
+						);
+
+						setTimeout(
+							function () {
+								this.bootstrapUi();
+							}.bind(this),
+							1000
+						);
 					}
 
 					//--------------------------------------------------------------------
