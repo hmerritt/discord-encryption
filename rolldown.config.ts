@@ -8,7 +8,6 @@ export default defineConfig({
 	input: "src/index.ts",
 	tsconfig: "tsconfig.json",
 	external: ["electron", "request"],
-	// @TODO: Fix `cssMinify` plugin not working:
 	plugins: [cssMinify(), htmlMinify()],
 	resolve: {
 		extensions: [".ts", ".js", ".tsx", ".jsx"]

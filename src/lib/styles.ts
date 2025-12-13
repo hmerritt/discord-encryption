@@ -1,10 +1,3 @@
-// @ts-nocheck
-
-/**
- * Passthrough tag literal. Useful for syntax highlighting only.
- */
-const css = (strings, ...values) => String.raw({ raw: strings }, ...values);
-
 /*
  * CSS styles
  */
