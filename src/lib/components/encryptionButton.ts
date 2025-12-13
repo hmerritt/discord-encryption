@@ -31,13 +31,13 @@ const markup = (script: Config, userData: UserData) => {
 		</svg>
 	`;
 
-	$button.onclick = (evt: any) => {
+	$button.onclick = (_: MouseEvent) => {
 		toggleState(script, userData);
 		$(`[role="textbox"]`).focus();
 	};
 
 	// Bind right click to adding encryption input
-	$button.oncontextmenu = (evt: any) => {
+	$button.oncontextmenu = (evt: MouseEvent) => {
 		evt.preventDefault();
 		encryptionInput(script, userData).toggleInput("");
 		$("#encryptionInput input").val(getEncryptionPassword(userData));
