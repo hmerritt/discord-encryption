@@ -1,5 +1,6 @@
-/.yarn/**             linguist-vendored
-/.yarn/releases/*     binary
-/.yarn/plugins/**/*   binary
-/.pnp.*               binary linguist-generated
-encryption.plugin.js  linguist-vendored
+/.yarn/**                 linguist-vendored
+/.yarn/releases/*         binary
+/.yarn/plugins/**/*       binary
+/.pnp.*                   binary linguist-generated
+0PluginLibrary.plugin.js  linguist-vendored
+encryption.plugin.js      linguist-vendored
