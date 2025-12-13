@@ -1,6 +1,6 @@
 {
 	"name": "discord-encryption",
-	"version": "3.2.0",
+	"version": "3.3.0",
 	"type": "module",
 	"description": "An experimental encryption solution for Discord",
 	"scripts": {
@@ -14,6 +14,7 @@
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
 		"@types/html-minifier-terser": "^7",
+		"@types/jquery": "^3",
 		"@types/node": "^20.17.24",
 		"clean-css": "^5.3.3",
 		"html-minifier-terser": "^7.2.0",

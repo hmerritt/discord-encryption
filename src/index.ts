@@ -15,7 +15,7 @@ import {
 	isEncryptionOn,
 	isMessageEncrypted,
 	log,
-	removeElements,
+	removeAll,
 	styles
 } from "./lib/index";
 
@@ -121,7 +121,7 @@ export default !window.ZeresPluginLibrary
 					 */
 					stop() {
 						// Remove all elements that have been injected
-						removeElements(`[${this.script.name}]`);
+						removeAll(`[${this.script.name}]`);
 						Patcher.unpatchAll();
 					}
 

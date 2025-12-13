@@ -5,9 +5,8 @@ import { UserData, config } from "./config";
 /**
  * Checks if an element exists in the DOM.
  */
-export const elementExists = (querySelector) => {
-	if ($(querySelector).length === 0) return false;
-	return true;
+export const elementExists = (querySelector: string) => {
+	return !!document.querySelector(querySelector);
 };
 
 /**
@@ -48,6 +47,37 @@ export const getOrCreateUserData = (userData: UserData, channelId = "global") =>
 };
 
 /**
+ * Run async task, catching and returning any errors as a variable (similar to Go).
+ *
+ * @example const [result, error] = await run(myPromise())
+ */
+export const run = async <T, E = Error>(
+	promise: Promise<T> | (() => Promise<T>)
+): Promise<[T, null] | [T, E]> => {
+	try {
+		if (typeof promise === "function") promise = promise();
+		const result = await promise;
+		return [result, null];
+	} catch (error) {
+		return [null as T, error as E];
+	}
+};
+
+/**
+ * Run synchronous task, catching and returning any errors as a variable (similar to Go).
+ *
+ * @example const [result, error] = runSync(() => myFn(...props))
+ */
+export const runSync = <R, E = Error>(cb: () => R): [R, null] | [R, E] => {
+	try {
+		const result = cb();
+		return [result, null];
+	} catch (error) {
+		return [null as R, error as E];
+	}
+};
+
+/**
  * Inject content into the page. Prevents multiple injections.
  */
 export const inject = (name, querySelector, how, content) => {
@@ -85,10 +115,42 @@ export const padChar = (
 	return str;
 };
 
-export const removeElements = (querySelector) => {
-	$(querySelector).remove();
+/**
+ * Remove every element that matches the selector
+ */
+export const removeAll = (selector: string) => {
+	const $el = selectAll(selector);
+	if (!$el) return;
+	$el.forEach((el) => el.remove());
 };
 
+/**
+ * Shorthand for querySelector
+ */
+export const select = <E extends Element>(
+	selector: string,
+	from: Element | Document = undefined
+) => {
+	if (from === undefined) from = document;
+	else if (from === null) return null;
+	return from.querySelector(selector) as E;
+};
+
+/**
+ * Shorthand for querySelectorAll
+ */
+export const selectAll = <E extends Element>(
+	selector: string,
+	from: Element | Document = undefined
+) => {
+	if (from === undefined) from = document;
+	else if (from === null) return null;
+	return from.querySelectorAll(selector) as NodeListOf<E>;
+};
+
+/**
+ * Returns the first `document.querySelectorAll` match from an array of selectors
+ */
 export const selectAllFirstMatch = <E extends Element>(selectors: string[]) => {
 	let markup: any;
 	for (const selector of selectors) {
