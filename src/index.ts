@@ -26,13 +26,8 @@ export default !window.ZeresPluginLibrary
 	: (([Plugin, Api]) => {
 			const plugin = (Plugin, Api) => {
 				const {
-					DiscordClasses,
-					DiscordModules,
-					DOMTools,
-					Patcher,
-					ReactTools,
-					Utilities,
-					WebpackModules
+					DiscordModules, // https://github.com/zerebos/BDPluginLibrary/blob/a375c48d7af5e1a000ce0d97a6cbbcf77a9461cc/src/modules/discordmodules.js
+					Patcher // https://github.com/zerebos/BDPluginLibrary/blob/a375c48d7af5e1a000ce0d97a6cbbcf77a9461cc/src/modules/patcher.js
 				} = Api;
 
 				return class Encryption extends Plugin {
@@ -75,6 +70,7 @@ export default !window.ZeresPluginLibrary
 
 						this.bootstrapUiWithTimeouts();
 
+						// Encrypt outgoing messages before they are sent
 						Patcher.instead(
 							DiscordModules.MessageActions,
 							"sendMessage",
@@ -98,12 +94,25 @@ export default !window.ZeresPluginLibrary
 							}
 						);
 
+						// Decrypt incoming messages after they are received
 						Patcher.after(
 							DiscordModules.MessageActions,
 							"receiveMessage",
-							function (thisObject, args, returnValue) {
-								this.bootstrapUiWithTimeouts();
-							}.bind(this)
+							() => this.bootstrapUiWithTimeouts()
+						);
+
+						// Patch the `dispatch` method to trigger message decryption once a message is received
+						BdApi.Patcher.after(
+							config.name,
+							DiscordModules.Dispatcher,
+							"dispatch",
+							(_, args) => {
+								const event = args[0];
+
+								if (event.type === "MESSAGE_CREATE") {
+									this.bootstrapUiWithTimeouts();
+								}
+							}
 						);
 					}
 
