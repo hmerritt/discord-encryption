@@ -1,4 +1,7 @@
+import pkgStatic from "../../package.json";
+
 export const config = {
+	outputFile: "encryption.plugin.js",
 	name: "encryptionPlugin",
 	nameTitle: "Encryption",
 	description: "Experimental message encryption using AES-GCM",
@@ -8,7 +11,7 @@ export const config = {
 		twitter_username: "hmrrtt"
 	},
 	version: {
-		current: "3.0.0",
+		current: pkgStatic.version,
 		latest: "",
 		update: false,
 		ignoreUpdate: false

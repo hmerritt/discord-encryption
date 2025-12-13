@@ -1,3 +1,4 @@
+import { encryptionButton, encryptionInput, updatePanel } from "./lib/components";
 import {
 	Config,
 	Dummy,
@@ -16,8 +17,7 @@ import {
 	log,
 	removeElements,
 	styles
-} from "lib";
-import { encryptionButton, encryptionInput, updatePanel } from "lib/components";
+} from "./lib/index";
 
 downloadRequiredLibraryIfMissing();
 

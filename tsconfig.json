@@ -3,11 +3,13 @@
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "src",
-		"lib": ["es6", "dom"],
-		"module": "ES6",
-		"target": "ES6",
+		"lib": ["es6", "ES2021.String", "dom"],
+		"module": "es2022",
 		"moduleResolution": "Node",
+		"noEmit": true,
+		"resolveJsonModule": true,
+		"target": "es2022",
 		"typeRoots": ["./node_modules/@types", "./src/types"]
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*", "scripts/**/*", "rolldown.config.ts"]
 }
