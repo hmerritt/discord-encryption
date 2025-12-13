@@ -6,7 +6,7 @@
  * @website      https://github.com/hmerritt/discord-encryption
  * @source       https://github.com/hmerritt/discord-encryption/releases/latest/download/encryption.plugin.js
  * @updateUrl    https://github.com/hmerritt/discord-encryption/releases/latest/download/encryption.plugin.js
- * @compiledOn   13/12/2025, 17:05:01
+ * @compiledOn   2025/12/13, 17:14:40
  */
 var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=Object.getOwnPropertyNames,i=Object.getPrototypeOf,a=Object.prototype.hasOwnProperty,o=(e,t)=>()=>(t||e((t={exports:{}}).exports,t),t.exports),s=(e,i,o,s)=>{if(i&&typeof i==`object`||typeof i==`function`)for(var c=r(i),l=0,u=c.length,d;l<u;l++)d=c[l],!a.call(e,d)&&d!==o&&t(e,d,{get:(e=>i[e]).bind(null,d),enumerable:!(s=n(i,d))||s.enumerable});return e},c=(n,r,a)=>(a=n==null?{}:e(i(n)),s(r||!n||!n.__esModule?t(a,`default`,{value:n,enumerable:!0}):a,n)),l=o(((e,t)=>{
 /*!

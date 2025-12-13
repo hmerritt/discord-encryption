@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import fs from "fs";
 import os from "os";
 import pathfs from "path";
@@ -23,7 +24,7 @@ export const patchBuild = async (shouldBumpVersion = true, silent = false) => {
  * @website      ${config.link.repository}
  * @source       ${config.link.source}
  * @updateUrl    ${config.link.source}
- * @compiledOn   ${new Date().toLocaleString()}
+ * @compiledOn   ${dayjs().format("YYYY/MM/DD, HH:mm:ss")}
  */
 `
 	);
