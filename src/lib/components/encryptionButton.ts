@@ -16,17 +16,20 @@ import { encryptionInput } from "./encryptionInput";
 
 const componentName = "encryptionButton";
 
-const html = (script: Config, userData: UserData) => {
+const markup = (script: Config, userData: UserData) => {
 	const $button = document.createElement("button");
 	$button.setAttribute(script.name, componentName);
 	$button.setAttribute("state", `${isEncryptionOn(userData) ?? false}`);
 	$button.setAttribute("class", componentName);
 
-	$button.innerHTML = `
-    <svg viewBox="0 0 24 24">
-        <path fill d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z" />
-    </svg>
-  `;
+	$button.innerHTML = html`
+		<svg viewBox="0 0 24 24">
+			<path
+				fill
+				d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8.9,6C8.9,4.29 10.29,2.9 12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6M16,16H13V19H11V16H8V14H11V11H13V14H16V16Z"
+			/>
+		</svg>
+	`;
 
 	$button.onclick = (evt: any) => {
 		toggleState(script, userData);
@@ -66,14 +69,14 @@ const toggleState = (script: Config, userData: UserData) => {
 };
 
 export const encryptionButton = (script: Config, userData: UserData) => ({
-	html: () => html(script, userData),
+	html: () => markup(script, userData),
 	close: (delay = 0) => close(script, userData, delay),
 	inject: () =>
 		inject(
 			componentName,
 			`[class^=attachWrapper] > [role="button"]`,
 			"after",
-			html(script, userData)
+			markup(script, userData)
 		),
 	toggleState: () => toggleState(script, userData)
 });

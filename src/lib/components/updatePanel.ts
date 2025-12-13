@@ -7,15 +7,15 @@ import { fade, inject } from "../helpers";
 
 const componentName = "updatePanel";
 
-const html = (script: Config, userData: UserData) => {
+const markup = (script: Config, userData: UserData) => {
 	const $div = document.createElement("div");
 	$div.setAttribute(script.name, componentName);
 	$div.setAttribute("class", `${componentName} animated fadeInUp`);
 
-	$div.innerHTML = `
-    <h2>An update is available for the discord encryption plugin!</h2>
-    <span action="close">No Thanks</span>
-  `;
+	$div.innerHTML = html`
+		<h2>An update is available for the discord encryption plugin!</h2>
+		<span action="close">No Thanks</span>
+	`;
 
 	$div.onclick = (evt: any) => {
 		// Open link to GitHub if:
@@ -37,7 +37,7 @@ const close = (script: Config, userData: UserData, delay = 0) => {
 };
 
 export const updatePanel = (script: Config, userData: UserData) => ({
-	html: () => html(script, userData),
+	html: () => markup(script, userData),
 	close: (delay = 0) => close(script, userData, delay),
-	inject: () => inject(componentName, "form", "after", html(script, userData))
+	inject: () => inject(componentName, "form", "after", markup(script, userData))
 });

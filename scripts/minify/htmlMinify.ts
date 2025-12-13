@@ -7,7 +7,7 @@ export const htmlMinify = () => {
 		async transform(code) {
 			// This regex looks for 'html' followed by a backtick,
 			// and captures the content within the backticks.
-			const htmlRegex = /markup`([\s\S]*?)`/g;
+			const htmlRegex = /html`([\s\S]*?)`/g;
 
 			let newCode = code;
 			const matches = Array.from(code.matchAll(htmlRegex));
