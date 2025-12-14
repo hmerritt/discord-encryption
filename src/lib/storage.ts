@@ -23,7 +23,7 @@ export const getUserData = (): UserData => {
 			if (getUserData?.global) return getUserData;
 		}
 	} catch (error) {
-		log("error", "Error parsing local storage", error);
+		log.error("Error parsing local storage", error);
 	}
 
 	return defaultUserData;
@@ -43,9 +43,9 @@ export const saveUserData = (userData: UserData) => {
 			return localStorage.setItem(config.name, JSON.stringify(userData));
 		}
 
-		log("warn", "No storage found, did not save data");
+		log.warn("No storage found, did not save data");
 	} catch (error) {
-		log("error", "Error saving to local storage", error);
+		log.error("Error saving to local storage", error);
 	}
 };
 

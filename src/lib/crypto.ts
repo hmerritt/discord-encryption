@@ -155,7 +155,7 @@ export const decryptAllMessages = async (channelData: UserData["global"]) => {
 				$(this).html(decrypted).addClass("decrypted");
 			})
 			.catch((e) => {
-				log("error", `Error decrypting message`, e);
+				log.error(`Error decrypting message`, e);
 				$(this)
 					.html("(failed to decrypt. most likely the wrong password)")
 					.addClass("not-decrypted");

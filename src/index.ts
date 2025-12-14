@@ -239,7 +239,7 @@ export default !window.ZeresPluginLibrary
 								this.components.updatePanel.inject();
 							}
 						} catch (err) {
-							log("error", `Error checking for updates: ${err}`);
+							log.error(`Error checking for updates:`, err);
 						}
 					}
 				};
