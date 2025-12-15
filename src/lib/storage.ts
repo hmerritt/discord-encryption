@@ -1,65 +1,82 @@
 import $ from "jquery";
 
-import { UserData, config } from "./config";
+import { getChannel } from "../state/actions";
 import { getChannelId } from "./helpers";
-import { log } from "./log";
 
-export const getUserData = (): UserData => {
-	const defaultUserData = {
-		global: {
-			password: "",
-			state: false
-		}
-	};
+export class BDStorage implements Storage {
+	private readonly scope: string;
 
-	try {
-		if (typeof window?.BdApi?.Data?.load !== "undefined") {
-			const getUserData = window?.BdApi.Data.load(config.name, config.name);
-			return JSON.parse(getUserData);
-		}
-
-		if (typeof localStorage !== "undefined") {
-			const getUserData = JSON.parse(localStorage.getItem(config.name) || "");
-			if (getUserData?.global) return getUserData;
-		}
-	} catch (error) {
-		log.error("Error parsing local storage", error);
+	constructor(pluginName: string) {
+		this.scope = pluginName;
 	}
 
-	return defaultUserData;
-};
-
-export const saveUserData = (userData: UserData) => {
-	try {
-		if (typeof window?.BdApi?.Data?.save !== "undefined") {
-			return window?.BdApi.Data.save(
-				config.name,
-				config.name,
-				JSON.stringify(userData)
-			);
-		}
-
-		if (typeof localStorage !== "undefined") {
-			return localStorage.setItem(config.name, JSON.stringify(userData));
-		}
-
-		log.warn("No storage found, did not save data");
-	} catch (error) {
-		log.error("Error saving to local storage", error);
+	/**
+	 * Returns the number of data items stored.
+	 * Note: This incurs a disk read to count keys.
+	 */
+	get length(): number {
+		const data = this.loadAll();
+		return data ? Object.keys(data).length : 0;
 	}
-};
 
-export const isEncryptionOn = (userData: any, channelId = getChannelId() || "") => {
-	const globalState = userData?.global?.state;
-	const chatState = userData?.[channelId]?.state;
-	return globalState || chatState ? true : false;
-};
+	/**
+	 * Clears all keys associated with this plugin scope.
+	 */
+	clear(): void {
+		// BdApi does not provide a direct 'clear' for a scope,
+		// so we delete keys individually to be safe, or save an empty state.
+		const data = this.loadAll();
+		if (!data) return;
 
-export const getEncryptionPassword = (
-	userData: any,
-	channelId = getChannelId() || ""
-): string => {
-	return userData?.[channelId]?.password || userData?.global?.password || "";
+		Object.keys(data).forEach((key) => {
+			this.removeItem(key);
+		});
+	}
+
+	/**
+	 * Returns the name of the nth key in storage.
+	 */
+	key(index: number): string | null {
+		const data = this.loadAll();
+		if (!data) return null;
+		const keys = Object.keys(data);
+		return keys[index] || null;
+	}
+
+	getItem(key: string): string | null {
+		const val = window.BdApi?.Data?.load(this.scope, key);
+
+		if (val === undefined || val === null) return null;
+
+		// The Storage API expects strings. If BdApi returns an object,
+		// we must serialize it to maintain contract compliance.
+		return typeof val === "string" ? val : JSON.stringify(val);
+	}
+
+	setItem(key: string, value: string): void {
+		window.BdApi?.Data?.save(this.scope, key, value);
+	}
+
+	removeItem(key: string): void {
+		window.BdApi?.Data?.delete(this.scope, key);
+	}
+
+	/**
+	 * Allows array-like access (e.g., storage['key']) which is
+	 * required by the strict TypeScript Storage interface.
+	 */
+	[name: string]: any;
+
+	// Internal Helper
+	private loadAll(): Record<string, any> | undefined {
+		// Calling load without a key typically returns the full data object
+		// in most BdApi implementations.
+		return window.BdApi?.Data?.load(this.scope) as Record<string, any> | undefined;
+	}
+}
+
+export const isEncryptionOn = (channelId = getChannelId() || "") => {
+	return getChannel(channelId)?.enabled ?? false;
 };
 
 export const checkInputPassword = () => {

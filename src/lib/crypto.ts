@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import { UserData } from "./config";
+import { getChannel } from "../state/actions";
 import { log } from "./log";
 
 export const PREFIX = "#!enc/";
@@ -141,7 +141,7 @@ export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
 
 export const isMessageEncrypted = (msg: string) => msg?.startsWith(PREFIX);
 
-export const decryptAllMessages = async (channelData: UserData["global"]) => {
+export const decryptAllMessages = async () => {
 	let markup = $(`div[class*="messageContent"]`);
 	if (!markup || markup.length === 0) markup = $(`div[id*="message-content"]`);
 
@@ -149,7 +149,7 @@ export const decryptAllMessages = async (channelData: UserData["global"]) => {
 		const message = $(this).text().trim();
 		if (!isMessageEncrypted(message)) return;
 
-		decrypt(message.slice(PREFIX.length), channelData.password)
+		decrypt(message.slice(PREFIX.length), getChannel().password)
 			.then((decrypted) => {
 				if (!decrypted) throw "decryption failed";
 				$(this).html(decrypted).addClass("decrypted");

@@ -1,4 +1,6 @@
-import { Config, UserData } from "../config";
+import { setIgnoreUpdate } from "state/actions";
+import { store } from "state/store";
+
 import { fade, inject } from "../helpers";
 
 /**
@@ -7,9 +9,9 @@ import { fade, inject } from "../helpers";
 
 const componentName = "updatePanel";
 
-const markup = (script: Config, userData: UserData) => {
+const markup = () => {
 	const $div = document.createElement("div");
-	$div.setAttribute(script.name, componentName);
+	$div.setAttribute(store.state.config.name, componentName);
 	$div.setAttribute("class", `${componentName} animated fadeInUp`);
 
 	$div.innerHTML = html`
@@ -21,23 +23,26 @@ const markup = (script: Config, userData: UserData) => {
 		// Open link to GitHub if:
 		// 1. User didn't click on close button
 		// 2. ignoreUpdates is true
-		if (evt?.target?.localName !== "span" && !script.version.ignoreUpdate) {
-			window.open(script.link.repository, "_blank");
+		if (
+			evt?.target?.localName !== "span" &&
+			!store.state.config.version.ignoreUpdate
+		) {
+			window.open(store.state.config.link.repository, "_blank");
 		}
 
-		close(script, userData, 0);
+		close(0);
 	};
 
 	return $div;
 };
 
-const close = (script: Config, userData: UserData, delay = 0) => {
-	script.version.ignoreUpdate = true;
-	fade(`[${script.name}].${componentName}`, "out", delay);
+const close = (delay = 0) => {
+	setIgnoreUpdate(true);
+	fade(`[${store.state.config.name}].${componentName}`, "out", delay);
 };
 
-export const updatePanel = (script: Config, userData: UserData) => ({
-	html: () => markup(script, userData),
-	close: (delay = 0) => close(script, userData, delay),
-	inject: () => inject(componentName, "form", "after", markup(script, userData))
+export const updatePanel = () => ({
+	html: markup,
+	close: (delay = 0) => close(delay),
+	inject: () => inject(componentName, "form", "after", markup())
 });

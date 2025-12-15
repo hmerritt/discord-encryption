@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import { UserData, config } from "./config";
+import { store } from "../state/index";
 
 /**
  * Checks if an element exists in the DOM.
@@ -30,20 +30,6 @@ export const fade = (querySelector, fadeType, delay = 0) => {
  */
 export const getChannelId = () => {
 	return window.location.pathname.split("/").pop();
-};
-
-/**
- * Create object if it does not exist.
- */
-export const getOrCreateUserData = (userData: UserData, channelId = "global") => {
-	if (!userData[channelId]) {
-		userData[channelId] = {
-			state: userData?.global?.state ?? false,
-			password: userData?.global?.password ?? ""
-		};
-	}
-
-	return userData[channelId];
 };
 
 /**
@@ -82,7 +68,7 @@ export const runSync = <R, E = Error>(cb: () => R): [R, null] | [R, E] => {
  */
 export const inject = (name, querySelector, how, content) => {
 	// Check if element has already been injected
-	if (!elementExists(`[${config.name}=${name}]`)) {
+	if (!elementExists(`[${store.state.config.name}=${name}]`)) {
 		// Decide how to add the content into the page
 		switch (how) {
 			case "append":
@@ -177,7 +163,7 @@ export const downloadRequiredLibraryIfMissing = () => {
 
 	window.BdApi.UI.showConfirmationModal(
 		"Library Missing",
-		`The library plugin needed for ${config.nameTitle} is missing. Please click Download Now to install it.`,
+		`The library plugin needed for ${store.state.config.nameTitle} is missing. Please click Download Now to install it.`,
 		{
 			confirmText: "Download Now",
 			cancelText: "Cancel",

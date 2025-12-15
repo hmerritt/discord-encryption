@@ -506,6 +506,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/store@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@tanstack/store@npm:0.8.0"
+  checksum: 10/14312e81a1e178db4aee5b96d22a894625b3b5e3c63d4c1b9184ca58f0c19145db6684d38ee8619f9d93d47d9987be7045e17cc63e717e81c81e8d1006a624b4
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -877,6 +884,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "discord-encryption@workspace:."
   dependencies:
+    "@tanstack/store": "npm:^0.8.0"
     "@trivago/prettier-plugin-sort-imports": "npm:^6.0.0"
     "@types/html-minifier-terser": "npm:^7"
     "@types/jquery": "npm:^3"

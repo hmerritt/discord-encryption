@@ -1,6 +1,6 @@
-import pkgStatic from "../../package.json";
+import pkgStatic from "../../../../package.json";
 
-export const config = {
+export const configStore = {
 	outputFile: "encryption.plugin.js",
 	name: "encryptionPlugin",
 	nameTitle: "Encryption",
@@ -24,5 +24,7 @@ export const config = {
 	}
 };
 
-export type Config = typeof config;
+export type ConfigStore = typeof configStore;
 export type UserData = Record<string, { password: string; state: boolean }>;
+
+export default configStore;
