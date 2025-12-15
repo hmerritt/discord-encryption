@@ -1,13 +1,12 @@
 import $ from "jquery";
 
-import { UserData, config } from "./config";
+import { store } from "../state/index";
 
 /**
  * Checks if an element exists in the DOM.
  */
-export const elementExists = (querySelector) => {
-	if ($(querySelector).length === 0) return false;
-	return true;
+export const elementExists = (querySelector: string) => {
+	return !!document.querySelector(querySelector);
 };
 
 /**
@@ -34,17 +33,34 @@ export const getChannelId = () => {
 };
 
 /**
- * Create object if it does not exist.
+ * Run async task, catching and returning any errors as a variable (similar to Go).
+ *
+ * @example const [result, error] = await run(myPromise())
  */
-export const getOrCreateUserData = (userData: UserData, channelId = "global") => {
-	if (!userData[channelId]) {
-		userData[channelId] = {
-			state: userData?.global?.state ?? false,
-			password: userData?.global?.password ?? ""
-		};
+export const run = async <T, E = Error>(
+	promise: Promise<T> | (() => Promise<T>)
+): Promise<[T, null] | [T, E]> => {
+	try {
+		if (typeof promise === "function") promise = promise();
+		const result = await promise;
+		return [result, null];
+	} catch (error) {
+		return [null as T, error as E];
 	}
+};
 
-	return userData[channelId];
+/**
+ * Run synchronous task, catching and returning any errors as a variable (similar to Go).
+ *
+ * @example const [result, error] = runSync(() => myFn(...props))
+ */
+export const runSync = <R, E = Error>(cb: () => R): [R, null] | [R, E] => {
+	try {
+		const result = cb();
+		return [result, null];
+	} catch (error) {
+		return [null as R, error as E];
+	}
 };
 
 /**
@@ -52,7 +68,7 @@ export const getOrCreateUserData = (userData: UserData, channelId = "global") =>
  */
 export const inject = (name, querySelector, how, content) => {
 	// Check if element has already been injected
-	if (!elementExists(`[${config.name}=${name}]`)) {
+	if (!elementExists(`[${store.state.config.name}=${name}]`)) {
 		// Decide how to add the content into the page
 		switch (how) {
 			case "append":
@@ -85,10 +101,42 @@ export const padChar = (
 	return str;
 };
 
-export const removeElements = (querySelector) => {
-	$(querySelector).remove();
+/**
+ * Remove every element that matches the selector
+ */
+export const removeAll = (selector: string) => {
+	const $el = selectAll(selector);
+	if (!$el) return;
+	$el.forEach((el) => el.remove());
 };
 
+/**
+ * Shorthand for querySelector
+ */
+export const select = <E extends Element>(
+	selector: string,
+	from: Element | Document = undefined
+) => {
+	if (from === undefined) from = document;
+	else if (from === null) return null;
+	return from.querySelector(selector) as E;
+};
+
+/**
+ * Shorthand for querySelectorAll
+ */
+export const selectAll = <E extends Element>(
+	selector: string,
+	from: Element | Document = undefined
+) => {
+	if (from === undefined) from = document;
+	else if (from === null) return null;
+	return from.querySelectorAll(selector) as NodeListOf<E>;
+};
+
+/**
+ * Returns the first `document.querySelectorAll` match from an array of selectors
+ */
 export const selectAllFirstMatch = <E extends Element>(selectors: string[]) => {
 	let markup: any;
 	for (const selector of selectors) {
@@ -115,7 +163,7 @@ export const downloadRequiredLibraryIfMissing = () => {
 
 	window.BdApi.UI.showConfirmationModal(
 		"Library Missing",
-		`The library plugin needed for ${config.nameTitle} is missing. Please click Download Now to install it.`,
+		`The library plugin needed for ${store.state.config.nameTitle} is missing. Please click Download Now to install it.`,
 		{
 			confirmText: "Download Now",
 			cancelText: "Cancel",

@@ -8,7 +8,7 @@ An experimental encryption solution for Discord using [BetterDiscord](https://gi
 
 Download the `encryption.plugin.js` from the releases [here](https://github.com/hmerritt/discord-encryption/releases/latest).
 
-## Features
+## Features ⚡
 
 Adds ability to encrypt / decrypt messages on discord using a set password
 

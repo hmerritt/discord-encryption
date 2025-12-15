@@ -1,23 +1,21 @@
+import { getChannel, setLatestVersion, setUpdateAvailable } from "state/actions";
+
 import { encryptionButton, encryptionInput, updatePanel } from "./lib/components";
 import {
-	Config,
 	Dummy,
 	PREFIX,
-	config,
 	decryptAllMessages,
 	downloadRequiredLibraryIfMissing,
 	encrypt,
-	getChannelId,
-	getOrCreateUserData,
-	getUserData,
 	inject,
 	injectLog,
 	isEncryptionOn,
 	isMessageEncrypted,
 	log,
-	removeElements,
+	removeAll,
 	styles
 } from "./lib/index";
+import { store } from "./state/index";
 
 downloadRequiredLibraryIfMissing();
 
@@ -31,7 +29,6 @@ export default !window.ZeresPluginLibrary
 				} = Api;
 
 				return class Encryption extends Plugin {
-					script: Config;
 					components: any;
 
 					/*
@@ -40,9 +37,6 @@ export default !window.ZeresPluginLibrary
 					constructor() {
 						super();
 						injectLog();
-
-						// Script metadata
-						this.script = { ...config };
 
 						// Stores component data
 						this.components = {};
@@ -78,15 +72,12 @@ export default !window.ZeresPluginLibrary
 								let message = args[1].content;
 
 								if (
-									isEncryptionOn(getUserData(), getChannelId()) &&
+									isEncryptionOn() &&
 									!isMessageEncrypted(message) &&
 									message?.length > 0
 								) {
-									const channelPass = getOrCreateUserData(
-										getUserData(),
-										getChannelId()
-									).password;
-									const enc = await encrypt(message, channelPass);
+									const password = getChannel().password;
+									const enc = await encrypt(message, password);
 									args[1].content = PREFIX + enc;
 								}
 
@@ -103,7 +94,7 @@ export default !window.ZeresPluginLibrary
 
 						// Patch the `dispatch` method to trigger message decryption once a message is received
 						BdApi.Patcher.after(
-							config.name,
+							store.state.config.name,
 							DiscordModules.Dispatcher,
 							"dispatch",
 							(_, args) => {
@@ -121,7 +112,7 @@ export default !window.ZeresPluginLibrary
 					 */
 					stop() {
 						// Remove all elements that have been injected
-						removeElements(`[${this.script.name}]`);
+						removeAll(`[${store.state.config.name}]`);
 						Patcher.unpatchAll();
 					}
 
@@ -139,7 +130,7 @@ export default !window.ZeresPluginLibrary
 						/*
 						 * CSS
 						 */
-						this.components.styles = `<style ${this.script.name}="styles">
+						this.components.styles = `<style ${store.state.config.name}="styles">
 								${styles}
 						</style>
 						`;
@@ -147,18 +138,9 @@ export default !window.ZeresPluginLibrary
 						/*
 						 * Register components
 						 */
-						this.components.updatePanel = updatePanel(
-							this.script,
-							getUserData()
-						);
-						this.components.encryptionButton = encryptionButton(
-							this.script,
-							getUserData()
-						);
-						this.components.encryptionInput = encryptionInput(
-							this.script,
-							getUserData()
-						);
+						this.components.updatePanel = updatePanel();
+						this.components.encryptionButton = encryptionButton();
+						this.components.encryptionInput = encryptionInput();
 					}
 
 					bootstrapUi() {
@@ -166,15 +148,8 @@ export default !window.ZeresPluginLibrary
 						 * Inject UI elements. Decode messages.
 						 */
 						this.components.encryptionInput.toggleInput("hide");
-
-						const channelId = getChannelId() || "global";
-						const channelState = getOrCreateUserData(
-							getUserData(),
-							channelId
-						);
-
 						this.components.encryptionButton.inject();
-						channelState.state && decryptAllMessages(channelState);
+						getChannel().enabled && decryptAllMessages();
 					}
 
 					bootstrapUiWithTimeouts() {
@@ -203,14 +178,16 @@ export default !window.ZeresPluginLibrary
 					 * Checks GitHub for a newer version of the script
 					 */
 					async checkForUpdate() {
+						setUpdateAvailable(false);
+
 						// Skip checking if user has previously chosen to ignore the update
-						if (this.script.version.ignoreUpdate) return;
+						if (store.state.config.version.ignoreUpdate) return;
 						log("Checking for updates...");
 
 						try {
 							// Get latest script from GitHub
 							const res = await (
-								await fetch(this.script.link.sourceConfig)
+								await fetch(store.state.config.link.sourceConfig)
 							).text();
 
 							// Extract latest version from script
@@ -218,19 +195,17 @@ export default !window.ZeresPluginLibrary
 							const latest = latestMatch == null ? "" : latestMatch[0];
 
 							// Update global var with latest version
-							this.script.version.latest = latest;
+							setLatestVersion(latest);
 
 							// Make script versions a number (remove '.')
-							const currentVersion = this.script.version.current.replace(
-								/\./g,
-								""
-							);
+							const currentVersion =
+								store.state.config.version.current.replace(/\./g, "");
 							const latestVersion = latest.replace(/\./g, "");
 
 							// Compare current and latest version
 							if (currentVersion < latestVersion) {
 								// Update is available
-								this.script.version.update = true;
+								setUpdateAvailable(true);
 								log(
 									`An update is available! [${currentVersion} => ${latestVersion}]`
 								);
@@ -239,7 +214,7 @@ export default !window.ZeresPluginLibrary
 								this.components.updatePanel.inject();
 							}
 						} catch (err) {
-							log("error", `Error checking for updates: ${err}`);
+							log.error(`Error checking for updates:`, err);
 						}
 					}
 				};
@@ -249,12 +224,12 @@ export default !window.ZeresPluginLibrary
 		})(
 			window.ZeresPluginLibrary.buildPlugin({
 				info: {
-					name: config.nameTitle,
-					authors: [config.author],
-					version: config.version.current,
-					description: config.description,
-					github: config.link.repository,
-					github_raw: config.link.source
+					name: store.state.config.nameTitle,
+					authors: [store.state.config.author],
+					version: store.state.config.version.current,
+					description: store.state.config.description,
+					github: store.state.config.link.repository,
+					github_raw: store.state.config.link.source
 				},
 				main: "index.js"
 			})

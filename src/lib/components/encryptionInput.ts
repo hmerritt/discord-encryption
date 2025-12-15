@@ -1,9 +1,9 @@
 import $ from "jquery";
+import { setIgnoreUpdate, setPassword } from "state/actions";
+import { store } from "state/store";
 
-import { Config, UserData } from "../config";
-import { fade, getChannelId, getOrCreateUserData, inject } from "../helpers";
-import { log } from "../log";
-import { checkInputPassword, saveUserData } from "../storage";
+import { fade, inject } from "../helpers";
+import { checkInputPassword } from "../storage";
 
 /**
  * Encryption input
@@ -11,10 +11,10 @@ import { checkInputPassword, saveUserData } from "../storage";
 
 const componentName = "encryptionInput";
 
-const markup = (script: Config, userData: UserData) => {
+const markup = () => {
 	const $div = document.createElement("div");
 	$div.setAttribute("id", componentName);
-	$div.setAttribute(script.name, componentName);
+	$div.setAttribute(store.state.config.name, componentName);
 	$div.setAttribute("class", `${componentName} animated fadeInUp`);
 
 	$div.innerHTML = html`
@@ -31,10 +31,7 @@ const markup = (script: Config, userData: UserData) => {
 	$div.onkeyup = (evt: any) => {
 		// set password and save in storage
 		checkInputPassword();
-		const channelId = getChannelId() || "global";
-		getOrCreateUserData(userData, channelId);
-		userData[channelId].password = evt.target.value;
-		saveUserData(userData);
+		setPassword(evt.target.value);
 	};
 
 	// Toggle between **** and text for the password
@@ -58,14 +55,14 @@ const markup = (script: Config, userData: UserData) => {
 	return $div;
 };
 
-const close = (script: Config, userData: UserData, delay = 0) => {
-	script.version.ignoreUpdate = true;
-	fade(`[${script.name}].${componentName}`, "out", delay);
+const close = (delay = 0) => {
+	setIgnoreUpdate(true);
+	fade(`[${store.state.config.name}].${componentName}`, "out", delay);
 };
 
-const toggleInput = (script: Config, userData: UserData, action = "") => {
+const toggleInput = (action = "") => {
 	if (action == "show" || (action == "" && $("#encryptionInput").length == 0)) {
-		inject(componentName, `form`, "before", markup(script, userData));
+		inject(componentName, `form`, "before", markup());
 	} else {
 		$("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
 		setTimeout(function () {
@@ -74,10 +71,10 @@ const toggleInput = (script: Config, userData: UserData, action = "") => {
 	}
 };
 
-export const encryptionInput = (script: Config, userData: UserData) => ({
-	html: () => markup(script, userData),
-	close: (delay = 0) => close(script, userData, delay),
-	inject: () => inject(componentName, "form", "before", markup(script, userData)),
+export const encryptionInput = () => ({
+	html: () => markup(),
+	close: (delay = 0) => close(delay),
+	inject: () => inject(componentName, "form", "before", markup()),
 	//
-	toggleInput: (action = "") => toggleInput(script, userData, action)
+	toggleInput: (action = "") => toggleInput(action)
 });

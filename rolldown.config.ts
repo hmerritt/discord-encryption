@@ -1,7 +1,7 @@
 import { defineConfig } from "rolldown";
 
 import { cssMinify, htmlMinify } from "./scripts/minify";
-import { config } from "./src/lib/config";
+import { configStore } from "./src/state/slices/config/configStore";
 
 // https://rollupjs.org/introduction/
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
 		extensions: [".ts", ".js", ".tsx", ".jsx"]
 	},
 	output: {
-		file: config.outputFile,
+		file: configStore.outputFile,
 		format: "cjs",
 		sourcemap: false,
 		minify: true

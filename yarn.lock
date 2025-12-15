@@ -506,6 +506,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/store@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@tanstack/store@npm:0.8.0"
+  checksum: 10/14312e81a1e178db4aee5b96d22a894625b3b5e3c63d4c1b9184ca58f0c19145db6684d38ee8619f9d93d47d9987be7045e17cc63e717e81c81e8d1006a624b4
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -560,12 +567,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/jquery@npm:^3":
+  version: 3.5.33
+  resolution: "@types/jquery@npm:3.5.33"
+  dependencies:
+    "@types/sizzle": "npm:*"
+  checksum: 10/9a9e2cddc584f9afa1970b0febac0b65bed6d8084baf9655346f5787ee1b25975a0f259b0c81edc7757fbb92d584ed2d1b39804ab78ab0238407c7e4b0376011
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^20.17.24":
   version: 20.17.24
   resolution: "@types/node@npm:20.17.24"
   dependencies:
     undici-types: "npm:~6.19.2"
   checksum: 10/0c5fe294b003656b0f95ffce295c08e7ed3fa814ba9bf891e146dced90322d186e63837db9d9bb14d4f294fbe1a6fa1c89ced0b173380c8aaeb90de6c3eddb3b
+  languageName: node
+  linkType: hard
+
+"@types/sizzle@npm:*":
+  version: 2.3.10
+  resolution: "@types/sizzle@npm:2.3.10"
+  checksum: 10/7898ae8c147d6804e1eb7811664bf6e58c382840b03a56976c668f17fbc76f752c4086bddb0d6c6d54e279a9259cf4fbb61a6ee968dac98615c42350f6f57d6a
   languageName: node
   linkType: hard
 
@@ -861,8 +884,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "discord-encryption@workspace:."
   dependencies:
+    "@tanstack/store": "npm:^0.8.0"
     "@trivago/prettier-plugin-sort-imports": "npm:^6.0.0"
     "@types/html-minifier-terser": "npm:^7"
+    "@types/jquery": "npm:^3"
     "@types/node": "npm:^20.17.24"
     clean-css: "npm:^5.3.3"
     dayjs: "npm:^1.11.19"

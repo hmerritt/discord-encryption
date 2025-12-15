@@ -1,13 +1,9 @@
 import $ from "jquery";
+import { getChannel, setEnabled, setIgnoreUpdate } from "state/actions";
+import { store } from "state/store";
 
-import { Config, UserData } from "../config";
-import { fade, getChannelId, getOrCreateUserData, inject } from "../helpers";
-import {
-	checkInputPassword,
-	getEncryptionPassword,
-	isEncryptionOn,
-	saveUserData
-} from "../storage";
+import { fade, inject } from "../helpers";
+import { checkInputPassword, isEncryptionOn } from "../storage";
 import { encryptionInput } from "./encryptionInput";
 
 /**
@@ -16,10 +12,10 @@ import { encryptionInput } from "./encryptionInput";
 
 const componentName = "encryptionButton";
 
-const markup = (script: Config, userData: UserData) => {
+const markup = () => {
 	const $button = document.createElement("button");
-	$button.setAttribute(script.name, componentName);
-	$button.setAttribute("state", `${isEncryptionOn(userData) ?? false}`);
+	$button.setAttribute(store.state.config.name, componentName);
+	$button.setAttribute("state", `${isEncryptionOn()}`);
 	$button.setAttribute("class", componentName);
 
 	$button.innerHTML = html`
@@ -31,52 +27,60 @@ const markup = (script: Config, userData: UserData) => {
 		</svg>
 	`;
 
-	$button.onclick = (evt: any) => {
-		toggleState(script, userData);
+	$button.onclick = (_: MouseEvent) => {
+		toggleState();
 		$(`[role="textbox"]`).focus();
 	};
 
 	// Bind right click to adding encryption input
-	$button.oncontextmenu = (evt: any) => {
+	$button.oncontextmenu = (evt: MouseEvent) => {
 		evt.preventDefault();
-		encryptionInput(script, userData).toggleInput("");
-		$("#encryptionInput input").val(getEncryptionPassword(userData));
+		encryptionInput().toggleInput("");
+		$("#encryptionInput input").val(getChannel()?.password || "");
 		checkInputPassword();
 	};
 
 	return $button;
 };
 
-const close = (script: Config, userData: UserData, delay = 0) => {
-	script.version.ignoreUpdate = true;
-	fade(`[${script.name}].${componentName}`, "out", delay);
+const close = (delay = 0) => {
+	setIgnoreUpdate(true);
+	fade(`[${store.state.config.name}].${componentName}`, "out", delay);
 };
 
-const toggleState = (script: Config, userData: UserData) => {
-	const $button = $(`[${script.name}].${componentName}`);
-	const channelId = getChannelId() || "global";
-	getOrCreateUserData(userData, channelId);
+const toggleState = () => {
+	const $button = $(`[${store.state.config.name}].${componentName}`);
 
-	if (isEncryptionOn(userData, channelId)) {
+	if (isEncryptionOn()) {
 		$button.attr("state", "false");
-		userData[channelId].state = false;
+		setEnabled(false);
 	} else {
 		$button.attr("state", "true");
-		userData[channelId].state = true;
+		setEnabled(true);
 	}
 
-	saveUserData(userData);
+	// Show input when encryption is enabled, but no password is set
+	// if (
+	// 	isEncryptionOn(userData, channelId) &&
+	// 	!getEncryptionPassword(userData, channelId)
+	// ) {
+	// 	encryptionInput(script, userData).toggleInput("show");
+
+	// 	// Hide input when encryption is disabled
+	// } else if (!isEncryptionOn(userData, channelId)) {
+	// 	encryptionInput(script, userData).toggleInput("");
+	// }
 };
 
-export const encryptionButton = (script: Config, userData: UserData) => ({
-	html: () => markup(script, userData),
-	close: (delay = 0) => close(script, userData, delay),
+export const encryptionButton = () => ({
+	html: () => markup(),
+	close: (delay = 0) => close(delay),
 	inject: () =>
 		inject(
 			componentName,
 			`[class^=attachWrapper] > [role="button"]`,
 			"after",
-			markup(script, userData)
+			markup()
 		),
-	toggleState: () => toggleState(script, userData)
+	toggleState: () => toggleState()
 });

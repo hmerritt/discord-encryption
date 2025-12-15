@@ -5,14 +5,14 @@ import pathfs from "path";
 import prependFile from "prepend-file";
 
 import * as core from "./core";
-import { config } from "../../src/lib/config";
+import { configStore as config } from "../../src/state/slices/config/configStore";
 
 const packageJsonPath = pathfs.join(core.__root, "package.json");
 const pluginOutputFile = pathfs.join(core.__root, config.outputFile);
 const betterDiscordPluginDir = `C:/Users/${os.userInfo().username}/AppData/Roaming/BetterDiscord/plugins`;
 
 export const patchBuild = async (shouldBumpVersion = true, silent = false) => {
-	if (shouldBumpVersion) await bumpVersion(false, silent);
+	// if (shouldBumpVersion) await bumpVersion(false, silent);
 
 	await prependFile(
 		pathfs.join(core.__root, config.outputFile),
