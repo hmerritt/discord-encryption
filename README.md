@@ -16,10 +16,9 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 - Passwords are saved per-chat
 - Messages are decrypted the moment they are receved with little to no delay
 - Encrypted messages appear as green
-- Messages that fail to be decrypted (most likely due to an incorrect password) display a message and appear as red
+- Messages that fail to be decrypted (most likely due to an incorrect password) will be highlighted red
 
-![Context](https://i.imgur.com/aKGUqEn.png)
-![Context](https://i.imgur.com/FqfRAAO.png)
+![Context](./docs/main-example-full.gif)
 
 ## How to use
 
@@ -33,24 +32,25 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 
 > It may ask to install an additional plugin `0PluginLibrary.plugin` which is required - It should install itself if you click `download`.
 
-![Context](https://i.imgur.com/H2Z7N7I.png)
-![Context](https://i.imgur.com/Ea0AdqO.png)
-
 ### Usage
 
 - To toggle the encryption simply click the lock icon. You will be prompted for a password, if none is found for the chat channel.
 - Received messages are decrypted automatically
 - To view or change the encryption password simply right-click the lock icon and an input box will appear - passwords are automatically saved as you type
 
-![Context](https://i.imgur.com/Zumi9SZ.png)
+![Context](./docs/encryption-button.gif)
 
 ### Encrypted Message
 
-![Context](https://imgur.com/xaZ19kI.png)
+![Context](./docs/encrypted-text.png)
+
+### Encrypted Message that failed to decrypt
+
+![Context](./docs/decrypted-text-failure.png)
 
 ### Decrypted Message
 
-![Context](https://imgur.com/bL9foML.png)
+![Context](./docs/decrypted-text-success.png)
 
 ## Development
 
