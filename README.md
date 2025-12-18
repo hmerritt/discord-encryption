@@ -54,9 +54,9 @@ Adds ability to encrypt / decrypt messages on discord using a set password
 
 ## Development
 
-This plugin uses [`rollup`](https://rollupjs.org/) to bundle what's in `src` into the final `encryption.plugin.js` script.
+This plugin uses [`rolldown`](https://rolldown.rs/) to bundle what's in `src` into the final `encryption.plugin.js` script.
 
-Getting `rollup` to work with `BetterDiscord` was a **gamechanger** as it allows the plugin to use multiple src files instead of just one. This makes development much nicer.
+Getting `rolldown` to work with `BetterDiscord` was a **gamechanger** as it allows the plugin to use multiple src files instead of just one. This makes development much nicer.
 
 How to build Build:
 
@@ -64,4 +64,4 @@ How to build Build:
 $ yarn && yarn build
 ```
 
-> This runs both `rollup`, and a `build-patch` script to add the required `BetterDiscord` META tags.
+> This runs both `rolldown`, and a `build-patch` script to add the required `BetterDiscord` META tags.
