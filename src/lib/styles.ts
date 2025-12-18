@@ -86,6 +86,8 @@ export const styles = css`
 		top: 8px;
 		left: 10px;
 		z-index: 1;
+		width: 24px;
+		height: 24px;
 	}
 
 	#encryptionInput input {
