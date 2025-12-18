@@ -64,7 +64,10 @@ const toggleInput = (action = "") => {
 export const encryptionInput = () => ({
 	html: () => markup(),
 	close: (delay = 0) => close(delay),
-	inject: () => inject(componentName, "main", "append", markup()),
+	inject: () => {
+		inject(componentName, "main", "append", markup());
+		select<HTMLInputElement>(`#encryptionInput input`)?.focus();
+	},
 	//
 	toggleInput: (action = "") => toggleInput(action)
 });

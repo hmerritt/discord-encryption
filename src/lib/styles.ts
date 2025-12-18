@@ -72,33 +72,33 @@ export const styles = css`
 		left: 8px;
 		bottom: 60px;
 		width: 280px;
-		height: 40px;
+		height: 50px;
 		z-index: 9999999;
 		overflow: hidden;
-		border-radius: 5px;
+		border-radius: 8px;
 		background-color: #ff2949;
 		transition: all 280ms ease 10ms;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+		padding: 0 16px;
 	}
 
 	#encryptionInput svg {
-		position: absolute;
 		cursor: pointer;
-		top: 8px;
-		left: 10px;
 		z-index: 1;
 		width: 24px;
 		height: 24px;
+		flex-grow: 0;
+		flex-shrink: 0;
 	}
 
 	#encryptionInput input {
-		position: absolute;
-		top: 0px;
-		left: 34px;
-		width: 100%;
+		flex: 1;
 		height: 100%;
 		border: none;
-		text-indent: 4px;
-		border-radius: 5px;
+		border-radius: 8px;
 		background-color: #ff2949;
 		transition: all 280ms ease;
 		outline: 0px !important;
@@ -107,7 +107,8 @@ export const styles = css`
 		box-shadow: none;
 		resize: none;
 		color: #ddd;
-		font-size: 0.88em;
+		font-size: 1em;
+		font-weight: bold;
 		padding: 1px 8px;
 		white-space: nowrap;
 	}
