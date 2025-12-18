@@ -28,7 +28,6 @@ const markup = () => {
 
 	$el.onclick = (_: MouseEvent) => {
 		toggleState();
-		$(`[role="textbox"]`).trigger("focus");
 	};
 
 	// Bind right click to adding encryption input
@@ -52,23 +51,16 @@ const toggleState = () => {
 	if (isEncryptionOn()) {
 		$el.attr("state", "false");
 		setEnabled(false);
+		encryptionInput().toggleInput("hide"); // Hide input when encryption is disabled
+		$(`[role="textbox"]`).trigger("focus"); // Focus on main message input
 	} else {
 		$el.attr("state", "true");
 		setEnabled(true);
 		getChannel().enabled && decryptAllMessages();
+		if (!getChannel()?.password)
+			encryptionInput().toggleInput("show"); // Open input if no password is set
+		else $(`[role="textbox"]`).trigger("focus"); // Focus on main message input
 	}
-
-	// Show input when encryption is enabled, but no password is set
-	// if (
-	// 	isEncryptionOn(userData, channelId) &&
-	// 	!getEncryptionPassword(userData, channelId)
-	// ) {
-	// 	encryptionInput(script, userData).toggleInput("show");
-
-	// 	// Hide input when encryption is disabled
-	// } else if (!isEncryptionOn(userData, channelId)) {
-	// 	encryptionInput(script, userData).toggleInput("");
-	// }
 };
 
 export const encryptionButton = () => ({
