@@ -20,7 +20,7 @@ export const fade = (querySelector, fadeType, delay = 0) => {
 			$(querySelector).removeClass("fadeInUp").addClass("fadeOutDown");
 			setTimeout(function () {
 				$(querySelector).remove();
-			}, 500);
+			}, 288);
 		}
 	}, delay);
 };

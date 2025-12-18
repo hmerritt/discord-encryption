@@ -1,7 +1,8 @@
 import $ from "jquery";
-import { getChannel, setEnabled, setIgnoreUpdate } from "state/actions";
-import { store } from "state/store";
 
+import { getChannel, setEnabled } from "../../state/actions";
+import { store } from "../../state/store";
+import { decryptAllMessages } from "../crypto";
 import { fade, inject } from "../helpers";
 import { checkInputPassword, isEncryptionOn } from "../storage";
 import { encryptionInput } from "./encryptionInput";
@@ -42,7 +43,6 @@ const markup = () => {
 };
 
 const close = (delay = 0) => {
-	setIgnoreUpdate(true);
 	fade(`[${store.state.config.name}].${componentName}`, "out", delay);
 };
 
@@ -55,6 +55,7 @@ const toggleState = () => {
 	} else {
 		$el.attr("state", "true");
 		setEnabled(true);
+		getChannel().enabled && decryptAllMessages();
 	}
 
 	// Show input when encryption is enabled, but no password is set

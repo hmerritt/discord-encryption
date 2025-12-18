@@ -1,7 +1,8 @@
 import $ from "jquery";
-import { setIgnoreUpdate, setPassword } from "state/actions";
-import { store } from "state/store";
 
+import { getChannel, setPassword } from "../../state/actions";
+import { store } from "../../state/store";
+import { decryptAllMessages } from "../crypto";
 import { fade, inject, select } from "../helpers";
 import { checkInputPassword } from "../storage";
 import { iconEyePartial, iconEyeSlash, iconEyeSlashPartial } from "./icons";
@@ -46,7 +47,6 @@ const markup = () => {
 };
 
 const close = (delay = 0) => {
-	setIgnoreUpdate(true);
 	fade(`[${store.state.config.name}].${componentName}`, "out", delay);
 };
 
@@ -54,10 +54,8 @@ const toggleInput = (action = "") => {
 	if (action == "show" || (action == "" && !select(`#encryptionInput`))) {
 		encryptionInput().inject();
 	} else {
-		$("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
-		setTimeout(function () {
-			$("#encryptionInput").remove();
-		}, 288);
+		getChannel().enabled && decryptAllMessages();
+		fade("#encryptionInput", "out", 0);
 	}
 };
 
