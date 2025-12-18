@@ -41,6 +41,7 @@ const markup = () => {
 			$("#encryptionInput input").attr("type", "password");
 			$("#encryptionInput svg path").attr("d", iconEyeSlashPartial);
 		}
+		select<HTMLInputElement>(`#encryptionInput input`)?.focus();
 	};
 
 	// Close input on enter
