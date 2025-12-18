@@ -152,13 +152,14 @@ export const decryptAllMessages = async () => {
 		decrypt(message.slice(PREFIX.length), getChannel().password)
 			.then((decrypted) => {
 				if (!decrypted) throw "decryption failed";
-				$(this).html(decrypted).addClass("decrypted");
+				$(this)
+					.html(decrypted)
+					.removeClass("not-decrypted")
+					.addClass("decrypted");
 			})
 			.catch((e) => {
 				log.error(`Error decrypting message`, e);
-				$(this)
-					.html("(failed to decrypt. most likely the wrong password)")
-					.addClass("not-decrypted");
+				$(this).removeClass("decrypted").addClass("not-decrypted");
 			});
 	});
 };
