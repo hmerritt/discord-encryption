@@ -2,23 +2,48 @@
  * CSS styles
  */
 export const styles = css`
-	form div[class^="attachWrapper"] {
-		display: flex;
+	.encryptionButton {
+		cursor: pointer;
+		flex: 0 0 auto;
+		padding: 12px 10px;
+		position: sticky;
+		transition: all 280ms ease;
 	}
 
-	.encryptionButton {
-		top: 0;
-		height: 44px;
-		padding: 10px 8px;
-		padding-right: 18px;
+	.encryptionButton__button {
 		position: sticky;
-		background: none;
-		transition: all 280ms ease;
-		-webkit-transition: all 280ms ease;
+		box-sizing: border-box;
+		height: unset;
+		padding: 0;
+		top: 0;
+		margin: 0;
+		margin-inline-start: -14px;
+		margin-inline-end: 10px;
+		border-radius: 8px;
+		transition-duration: 0.2s;
+		align-items: center;
+		display: flex;
+		justify-content: center;
 	}
+	.encryptionButton:hover .encryptionButton__button {
+		background-color: color-mix(
+			in oklab,
+			hsl(240 calc(1 * 4%) 60.784% /0.23921568627450981) 100%,
+			hsl(0 0% 0% /0.23921568627450981) 0%
+		);
+	}
+
+	.encryptionButton__buttonWrapper {
+		transform: none;
+		border-radius: 8px;
+		height: 22px;
+		padding: 6px;
+		transition-duration: 0.2s;
+	}
+
 	.encryptionButton svg {
-		width: 24px;
-		height: 24px;
+		width: 22px;
+		height: 22px;
 	}
 
 	.encryptionButton[state="true"] path {

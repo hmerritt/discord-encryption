@@ -62,7 +62,7 @@ const close = (delay = 0) => {
 
 const toggleInput = (action = "") => {
 	if (action == "show" || (action == "" && $("#encryptionInput").length == 0)) {
-		inject(componentName, `form`, "before", markup());
+		inject(componentName, "form", "before", markup());
 	} else {
 		$("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
 		setTimeout(function () {
