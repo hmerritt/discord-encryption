@@ -66,7 +66,12 @@ export const runSync = <R, E = Error>(cb: () => R): [R, null] | [R, E] => {
 /**
  * Inject content into the page. Prevents multiple injections.
  */
-export const inject = (name, querySelector, how, content) => {
+export const inject = (
+	name: string,
+	querySelector: string,
+	how: "append" | "prepend" | "after" | "before",
+	content: any
+) => {
 	// Check if element has already been injected
 	if (!elementExists(`[${store.state.config.name}=${name}]`)) {
 		// Decide how to add the content into the page

@@ -121,6 +121,7 @@ export default !window.ZeresPluginLibrary
 					 */
 					onSwitch() {
 						this.bootstrapUiWithTimeouts();
+						this.components.encryptionInput.toggleInput("hide");
 					}
 
 					//--------------------------------------------------------------------
@@ -147,7 +148,6 @@ export default !window.ZeresPluginLibrary
 						/*
 						 * Inject UI elements. Decode messages.
 						 */
-						this.components.encryptionInput.toggleInput("hide");
 						this.components.encryptionButton.inject();
 						getChannel().enabled && decryptAllMessages();
 					}

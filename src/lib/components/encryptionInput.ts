@@ -2,7 +2,7 @@ import $ from "jquery";
 import { setIgnoreUpdate, setPassword } from "state/actions";
 import { store } from "state/store";
 
-import { fade, inject } from "../helpers";
+import { fade, inject, select } from "../helpers";
 import { checkInputPassword } from "../storage";
 
 /**
@@ -61,8 +61,8 @@ const close = (delay = 0) => {
 };
 
 const toggleInput = (action = "") => {
-	if (action == "show" || (action == "" && $("#encryptionInput").length == 0)) {
-		inject(componentName, "form", "before", markup());
+	if (action == "show" || (action == "" && !select(`#encryptionInput`))) {
+		encryptionInput().inject();
 	} else {
 		$("#encryptionInput").removeClass("fadeInUp").addClass("fadeOutDown");
 		setTimeout(function () {
@@ -74,7 +74,7 @@ const toggleInput = (action = "") => {
 export const encryptionInput = () => ({
 	html: () => markup(),
 	close: (delay = 0) => close(delay),
-	inject: () => inject(componentName, "form", "before", markup()),
+	inject: () => inject(componentName, "main", "append", markup()),
 	//
 	toggleInput: (action = "") => toggleInput(action)
 });

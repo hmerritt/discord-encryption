@@ -2,6 +2,12 @@
  * CSS styles
  */
 export const styles = css`
+	main,
+	form {
+		position: relative !important;
+		overflow: visible !important;
+	}
+
 	.encryptionButton {
 		cursor: pointer;
 		flex: 0 0 auto;
@@ -25,7 +31,8 @@ export const styles = css`
 		display: flex;
 		justify-content: center;
 	}
-	.encryptionButton:hover .encryptionButton__button {
+	.encryptionButton:hover .encryptionButton__button,
+	.encryptionButton:hover .encryptionButton__buttonWrapper {
 		background-color: color-mix(
 			in oklab,
 			hsl(240 calc(1 * 4%) 60.784% /0.23921568627450981) 100%,
@@ -61,14 +68,15 @@ export const styles = css`
 	}
 
 	#encryptionInput {
-		position: relative;
+		position: absolute;
+		left: 8px;
+		bottom: 60px;
 		width: 280px;
 		height: 40px;
+		z-index: 9999999;
 		overflow: hidden;
-		margin-left: 16px;
 		border-radius: 5px;
 		background-color: #ff2949;
-		-webkit-transition: all 280ms ease 10ms;
 		transition: all 280ms ease 10ms;
 	}
 
@@ -90,7 +98,6 @@ export const styles = css`
 		text-indent: 4px;
 		border-radius: 5px;
 		background-color: #ff2949;
-		-webkit-transition: all 280ms ease;
 		transition: all 280ms ease;
 		outline: 0px !important;
 		-webkit-appearance: none;
@@ -137,7 +144,6 @@ export const styles = css`
 		-webkit-user-select: none;
 		user-select: none;
 		transition: all 280ms ease 40ms;
-		-webkit-transition: all 280ms ease 40ms;
 	}
 	.updatePanel:hover {
 		background-color: #677bc4;
