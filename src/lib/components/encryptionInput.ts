@@ -43,6 +43,13 @@ const markup = () => {
 		}
 	};
 
+	// Close input on enter
+	$div.querySelector("input").onkeyup = (evt: any) => {
+		if (evt.key === "Enter") {
+			toggleInput("hide");
+		}
+	};
+
 	return $div;
 };
 
@@ -54,8 +61,9 @@ const toggleInput = (action = "") => {
 	if (action == "show" || (action == "" && !select(`#encryptionInput`))) {
 		encryptionInput().inject();
 	} else {
-		getChannel().enabled && decryptAllMessages();
-		fade("#encryptionInput", "out", 0);
+		fade("#encryptionInput", "out", 0); // Hide input
+		$(`[role="textbox"]`)?.trigger?.("focus"); // Focus on main message input
+		getChannel().enabled && decryptAllMessages(); // Decrypt all messages
 	}
 };
 
