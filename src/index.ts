@@ -92,19 +92,25 @@ export default !window.ZeresPluginLibrary
 							() => this.bootstrapUiWithTimeouts()
 						);
 
-						// Patch the `dispatch` method to trigger message decryption once a message is received
-						BdApi.Patcher.after(
-							store.state.config.name,
-							DiscordModules.Dispatcher,
-							"dispatch",
-							(_, args) => {
-								const event = args[0];
+  						// Patch `dispatch` to re-run decryption when new messages are created.
+  						// `Dispatcher` can be unavailable during startup on some Discord builds.
+  						if (
+  							DiscordModules.Dispatcher &&
+  							typeof DiscordModules.Dispatcher.dispatch === "function"
+  						) {
+  							BdApi.Patcher.after(
+  								store.state.config.name,
+  								DiscordModules.Dispatcher,
+  								"dispatch",
+  								(_, args) => {
+  									const event = args[0];
 
-								if (event.type === "MESSAGE_CREATE") {
-									this.bootstrapUiWithTimeouts();
-								}
-							}
-						);
+  									if (event.type === "MESSAGE_CREATE") {
+  										this.bootstrapUiWithTimeouts();
+  									}
+  								}
+  							);
+  						}
 					}
 
 					/*
