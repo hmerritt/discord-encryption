@@ -17,13 +17,15 @@ type BdApiPartial = {
 	Themes: any;
 	UI: any;
 	Utils: any;
-	Webpack: any;
+	Webpack: {
+		getByKeys: (...args: any[]) => any;
+		[x: string]: any;
+	};
 	[x: string]: any;
 };
 
 declare global {
 	var BdApi: BdApiPartial;
-	var ZeresPluginLibrary: any;
 
 	var log: LogFn;
 	var logn: LognFn;
@@ -36,7 +38,6 @@ declare global {
 
 	interface Window {
 		BdApi: BdApiPartial;
-		ZeresPluginLibrary: any;
 
 		log: LogFn;
 		logn: LognFn;

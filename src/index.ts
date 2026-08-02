@@ -2,10 +2,8 @@ import { getChannel, setLatestVersion, setUpdateAvailable } from "state/actions"
 
 import { encryptionButton, encryptionInput, updatePanel } from "./lib/components";
 import {
-	Dummy,
 	PREFIX,
 	decryptAllMessages,
-	downloadRequiredLibraryIfMissing,
 	encrypt,
 	inject,
 	injectLog,
@@ -17,226 +15,216 @@ import {
 } from "./lib/index";
 import { store } from "./state/index";
 
-downloadRequiredLibraryIfMissing();
+type MessageActions = {
+	sendMessage: (...args: any[]) => any;
+};
 
-export default !window.ZeresPluginLibrary
-	? Dummy
-	: (([Plugin, Api]) => {
-			const plugin = (Plugin, Api) => {
-				const {
-					DiscordModules, // https://github.com/zerebos/BDPluginLibrary/blob/a375c48d7af5e1a000ce0d97a6cbbcf77a9461cc/src/modules/discordmodules.js
-					Patcher // https://github.com/zerebos/BDPluginLibrary/blob/a375c48d7af5e1a000ce0d97a6cbbcf77a9461cc/src/modules/patcher.js
-				} = Api;
+type Dispatcher = {
+	dispatch: (...args: any[]) => any;
+	subscribe: (...args: any[]) => any;
+};
 
-				return class Encryption extends Plugin {
-					components: any;
+export default class Encryption {
+	components: any;
+	started = false;
+	bootstrapTimeouts: ReturnType<typeof setTimeout>[] = [];
 
-					/*
-					 * Define global variables
-					 */
-					constructor() {
-						super();
-						injectLog();
+	constructor() {
+		injectLog();
 
-						// Stores component data
-						this.components = {};
-					}
+		// Stores component data
+		this.components = {};
+	}
 
-					/*
-					 * Runs once on plugin load (before start)
-					 */
-					load() {
-						injectLog();
+	/*
+	 * Runs once on plugin load (before start)
+	 */
+	load() {
+		injectLog();
 
-						// Initialize DOM components
-						this.initializeComponents();
+		// Initialize DOM components
+		this.initializeComponents();
 
-						// Check for new version
-						this.checkForUpdate();
-					}
+		// Check for new version
+		this.checkForUpdate();
+	}
 
-					/*
-					 * Runs each time plugin starts (after load on initial start)
-					 */
-					start() {
-						// Inject styles
-						inject("styles", "head", "append", this.components.styles);
+	/*
+	 * Runs each time plugin starts (after load on initial start)
+	 */
+	start() {
+		const messageActions = BdApi.Webpack.getByKeys("sendMessage") as MessageActions;
+		const dispatcher = BdApi.Webpack.getByKeys("dispatch", "subscribe", "register", {
+			searchExports: true
+		}) as Dispatcher;
 
-						this.bootstrapUiWithTimeouts();
+		if (!messageActions || typeof messageActions.sendMessage !== "function") {
+			throw new Error("Could not resolve Discord's message actions module.");
+		}
 
-						// Encrypt outgoing messages before they are sent
-						Patcher.instead(
-							DiscordModules.MessageActions,
-							"sendMessage",
-							async (thisObject, args, originalFunction) => {
-								let message = args[1].content;
+		if (!dispatcher || typeof dispatcher.dispatch !== "function") {
+			throw new Error("Could not resolve Discord's dispatcher module.");
+		}
 
-								if (
-									isEncryptionOn() &&
-									!isMessageEncrypted(message) &&
-									message?.length > 0
-								) {
-									const password = getChannel().password;
-									const enc = await encrypt(message, password);
-									args[1].content = PREFIX + enc;
-								}
+		this.started = true;
 
-								return originalFunction.apply(thisObject, args);
-							}
-						);
+		// Inject styles
+		inject("styles", "head", "append", this.components.styles);
 
-						// Decrypt incoming messages after they are received
-						Patcher.after(
-							DiscordModules.MessageActions,
-							"receiveMessage",
-							() => this.bootstrapUiWithTimeouts()
-						);
+		this.bootstrapUiWithTimeouts();
 
-  						// Patch `dispatch` to re-run decryption when new messages are created.
-  						// `Dispatcher` can be unavailable during startup on some Discord builds.
-  						if (
-  							DiscordModules.Dispatcher &&
-  							typeof DiscordModules.Dispatcher.dispatch === "function"
-  						) {
-  							BdApi.Patcher.after(
-  								store.state.config.name,
-  								DiscordModules.Dispatcher,
-  								"dispatch",
-  								(_, args) => {
-  									const event = args[0];
+		// Encrypt outgoing messages before they are sent
+		BdApi.Patcher.instead(
+			store.state.config.name,
+			messageActions,
+			"sendMessage",
+			async (_, args, originalFunction) => {
+				const payload = args[1];
+				const message = payload?.content;
 
-  									if (event.type === "MESSAGE_CREATE") {
-  										this.bootstrapUiWithTimeouts();
-  									}
-  								}
-  							);
-  						}
-					}
+				if (
+					isEncryptionOn() &&
+					typeof message === "string" &&
+					message.length > 0 &&
+					!isMessageEncrypted(message)
+				) {
+					const password = getChannel().password;
+					const enc = await encrypt(message, password);
+					payload.content = PREFIX + enc;
+				}
 
-					/*
-					 * Runs when plugin has been stopped
-					 */
-					stop() {
-						// Remove all elements that have been injected
-						removeAll(`[${store.state.config.name}]`);
-						Patcher.unpatchAll();
-					}
-
-					/**
-					 * Runs after every channel switch
-					 */
-					onSwitch() {
-						this.bootstrapUiWithTimeouts();
-						this.components.encryptionInput.toggleInput("hide");
-					}
-
-					//--------------------------------------------------------------------
-					//--------------------------------------------------------------------
-
-					initializeComponents() {
-						/*
-						 * CSS
-						 */
-						this.components.styles = `<style ${store.state.config.name}="styles">
-								${styles}
-						</style>
-						`;
-
-						/*
-						 * Register components
-						 */
-						this.components.updatePanel = updatePanel();
-						this.components.encryptionButton = encryptionButton();
-						this.components.encryptionInput = encryptionInput();
-					}
-
-					bootstrapUi() {
-						/*
-						 * Inject UI elements. Decode messages.
-						 */
-						this.components.encryptionButton.inject();
-						getChannel().enabled && decryptAllMessages();
-					}
-
-					bootstrapUiWithTimeouts() {
-						// Bootstrap UI optimistically (with fallbacks incase messages haven't rendered yet)
-						this.bootstrapUi();
-
-						setTimeout(
-							function () {
-								this.bootstrapUi();
-							}.bind(this),
-							100
-						);
-
-						setTimeout(
-							function () {
-								this.bootstrapUi();
-							}.bind(this),
-							1000
-						);
-					}
-
-					//--------------------------------------------------------------------
-					//--------------------------------------------------------------------
-
-					/*
-					 * Checks GitHub for a newer version of the script
-					 */
-					async checkForUpdate() {
-						setUpdateAvailable(false);
-
-						// Skip checking if user has previously chosen to ignore the update
-						if (store.state.config.version.ignoreUpdate) return;
-						log("Checking for updates...");
-
-						try {
-							// Get latest script from GitHub
-							const res = await (
-								await fetch(store.state.config.link.sourceConfig)
-							).text();
-
-							// Extract latest version from script
-							const latestMatch = res.match(/(\d.\d.\d)/);
-							const latest = latestMatch == null ? "" : latestMatch[0];
-
-							// Update global var with latest version
-							setLatestVersion(latest);
-
-							// Make script versions a number (remove '.')
-							const currentVersion =
-								store.state.config.version.current.replace(/\./g, "");
-							const latestVersion = latest.replace(/\./g, "");
-
-							// Compare current and latest version
-							if (currentVersion < latestVersion) {
-								// Update is available
-								setUpdateAvailable(true);
-								log(
-									`An update is available! [${currentVersion} => ${latestVersion}]`
-								);
-
-								// add update pop-up to ui
-								this.components.updatePanel.inject();
-							}
-						} catch (err) {
-							log.error(`Error checking for updates:`, err);
-						}
-					}
-				};
-			};
-
-			return plugin(Plugin, Api);
-		})(
-			window.ZeresPluginLibrary.buildPlugin({
-				info: {
-					name: store.state.config.nameTitle,
-					authors: [store.state.config.author],
-					version: store.state.config.version.current,
-					description: store.state.config.description,
-					github: store.state.config.link.repository,
-					github_raw: store.state.config.link.source
-				},
-				main: "index.js"
-			})
+				return originalFunction(...args);
+			}
 		);
+
+		// Re-run decryption when Discord receives a new message.
+		BdApi.Patcher.after(
+			store.state.config.name,
+			dispatcher,
+			"dispatch",
+			(_, args) => {
+				const event = args[0];
+
+				if (event?.type === "MESSAGE_CREATE") {
+					this.bootstrapUiWithTimeouts();
+				}
+			}
+		);
+	}
+
+	/*
+	 * Runs when plugin has been stopped
+	 */
+	stop() {
+		this.started = false;
+		this.bootstrapTimeouts.forEach((timeout) => clearTimeout(timeout));
+		this.bootstrapTimeouts = [];
+
+		BdApi.Patcher.unpatchAll(store.state.config.name);
+
+		// Remove all elements that have been injected
+		removeAll(`[${store.state.config.name}]`);
+	}
+
+	/**
+	 * Runs after every channel switch
+	 */
+	onSwitch() {
+		if (!this.started) return;
+
+		this.bootstrapUiWithTimeouts();
+		this.components.encryptionInput.toggleInput("hide");
+	}
+
+	//--------------------------------------------------------------------
+	//--------------------------------------------------------------------
+
+	initializeComponents() {
+		/*
+		 * CSS
+		 */
+		this.components.styles = `<style ${store.state.config.name}="styles">
+				${styles}
+		</style>
+		`;
+
+		/*
+		 * Register components
+		 */
+		this.components.updatePanel = updatePanel();
+		this.components.encryptionButton = encryptionButton();
+		this.components.encryptionInput = encryptionInput();
+	}
+
+	bootstrapUi() {
+		if (!this.started) return;
+
+		/*
+		 * Inject UI elements. Decode messages.
+		 */
+		this.components.encryptionButton.inject();
+		getChannel().enabled && decryptAllMessages();
+	}
+
+	bootstrapUiWithTimeouts() {
+		if (!this.started) return;
+
+		// Bootstrap UI optimistically (with fallbacks in case messages haven't rendered yet)
+		this.bootstrapUi();
+		this.scheduleBootstrap(100);
+		this.scheduleBootstrap(1000);
+	}
+
+	scheduleBootstrap(delay: number) {
+		const timeout = setTimeout(() => {
+			this.bootstrapTimeouts = this.bootstrapTimeouts.filter(
+				(candidate) => candidate !== timeout
+			);
+			this.bootstrapUi();
+		}, delay);
+
+		this.bootstrapTimeouts.push(timeout);
+	}
+
+	//--------------------------------------------------------------------
+	//--------------------------------------------------------------------
+
+	/*
+	 * Checks GitHub for a newer version of the script
+	 */
+	async checkForUpdate() {
+		setUpdateAvailable(false);
+
+		// Skip checking if user has previously chosen to ignore the update
+		if (store.state.config.version.ignoreUpdate) return;
+		log("Checking for updates...");
+
+		try {
+			// Get latest script from GitHub
+			const res = await (await fetch(store.state.config.link.sourceConfig)).text();
+
+			// Extract latest version from script
+			const latestMatch = res.match(/(\d.\d.\d)/);
+			const latest = latestMatch == null ? "" : latestMatch[0];
+
+			// Update global var with latest version
+			setLatestVersion(latest);
+
+			// Make script versions a number (remove '.')
+			const currentVersion = store.state.config.version.current.replace(/\./g, "");
+			const latestVersion = latest.replace(/\./g, "");
+
+			// Compare current and latest version
+			if (currentVersion < latestVersion) {
+				// Update is available
+				setUpdateAvailable(true);
+				log(`An update is available! [${currentVersion} => ${latestVersion}]`);
+
+				// add update pop-up to ui
+				this.components.updatePanel.inject();
+			}
+		} catch (err) {
+			log.error(`Error checking for updates:`, err);
+		}
+	}
+}

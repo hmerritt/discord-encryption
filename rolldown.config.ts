@@ -7,7 +7,6 @@ import { configStore } from "./src/state/slices/config/configStore";
 export default defineConfig({
 	input: "src/index.ts",
 	tsconfig: "tsconfig.json",
-	external: ["electron", "request"],
 	plugins: [cssMinify(), htmlMinify()],
 	resolve: {
 		extensions: [".ts", ".js", ".tsx", ".jsx"]
