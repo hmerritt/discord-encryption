@@ -124,6 +124,7 @@ export const styles = css`
 	div[class*="messageContent"].decrypted,
 	div[id*="message-content"].decrypted {
 		color: #43b581 !important;
+		white-space: break-spaces;
 	}
 	div[class*="messageContent"].decrypted a,
 	div[id*="message-content"].decrypted a {

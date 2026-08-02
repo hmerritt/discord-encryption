@@ -83,6 +83,25 @@ describe("decrypted message rendering", () => {
 		expect(element.firstChild?.nodeType).toBe(Node.TEXT_NODE);
 	});
 
+	it.each([
+		["single", "first\nsecond"],
+		["double", "first\n\nsecond"],
+		["triple", "first\n\n\nsecond"],
+		["leading", "\n\nfirst"],
+		["trailing", "first\n\n"],
+		["whitespace-only", " \n \n  "]
+	])("preserves every %s line break in the plaintext fallback", (_, plaintext) => {
+		installBdApi(null);
+		const element = createMessage();
+
+		renderDecryptedMessage(element, plaintext, ciphertext, "channel-1", "password");
+
+		expect(element.textContent).toBe(plaintext);
+		expect(element.childNodes).toHaveLength(1);
+		expect(element.firstChild?.nodeType).toBe(Node.TEXT_NODE);
+		expect(element.children).toHaveLength(0);
+	});
+
 	it("logs only one compatibility warning when the Markdown parser is unavailable", () => {
 		installBdApi(null);
 		const first = createMessage();
@@ -107,7 +126,11 @@ describe("decrypted message rendering", () => {
 
 		renderDecryptedMessage(element, plaintext, ciphertext, "channel-1", "password");
 
-		expect(parser.parse).toHaveBeenCalledWith(plaintext, false, {
+		expect(parser.parse).toHaveBeenCalledWith(plaintext, true, {
+			allowEmojiLinks: true,
+			allowHeading: true,
+			allowLinks: true,
+			allowList: true,
 			channelId: "channel-1"
 		});
 		expect(api.createElement).toHaveBeenCalledWith(
@@ -116,7 +139,9 @@ describe("decrypted message rendering", () => {
 			parsed
 		);
 		expect(api.render).toHaveBeenCalledOnce();
-		expect(element.querySelector("[data-encryption-render-root]")).not.toBeNull();
+		const mount = element.querySelector<HTMLElement>("[data-encryption-render-root]");
+		expect(mount).not.toBeNull();
+		expect(mount?.style.whiteSpace).toBe("break-spaces");
 		expect(element.querySelector("style")).toBeNull();
 		expect(element.classList.contains("decrypted")).toBe(true);
 	});

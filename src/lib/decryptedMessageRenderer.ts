@@ -3,11 +3,19 @@ import { log } from "./log";
 
 export type DiscordReactNode = unknown;
 
+export type DiscordMarkdownOptions = {
+	allowEmojiLinks?: boolean;
+	allowHeading?: boolean;
+	allowLinks?: boolean;
+	allowList?: boolean;
+	channelId?: string;
+};
+
 export type DiscordMarkdownParser = {
 	parse: (
 		plaintext: string,
 		inline?: boolean,
-		options?: { channelId?: string }
+		options?: DiscordMarkdownOptions
 	) => DiscordReactNode;
 	parseTopic: (...args: any[]) => DiscordReactNode;
 	parseEmbedTitle: (...args: any[]) => DiscordReactNode;
@@ -171,10 +179,17 @@ export const renderDecryptedMessage = (
 	if (parser) {
 		let root: ReactRoot | undefined;
 		try {
-			const parsed = parser.parse(plaintext, false, { channelId });
+			const parsed = parser.parse(plaintext, true, {
+				allowEmojiLinks: true,
+				allowHeading: true,
+				allowLinks: true,
+				allowList: true,
+				channelId
+			});
 			const mount = document.createElement("div");
 			mount.setAttribute("data-encryption-render-root", "");
 			mount.style.display = "contents";
+			mount.style.whiteSpace = "break-spaces";
 
 			const createRoot = BdApi.ReactDOM?.createRoot;
 			if (typeof createRoot !== "function") {
