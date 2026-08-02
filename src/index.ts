@@ -3,8 +3,11 @@ import { getChannel, setLatestVersion, setUpdateAvailable } from "state/actions"
 import { encryptionButton, encryptionInput, updatePanel } from "./lib/components";
 import {
 	PREFIX,
+	cancelPendingDecryptions,
+	cleanupDecryptedMessageRenderer,
 	decryptAllMessages,
 	encrypt,
+	initializeDecryptedMessageRenderer,
 	inject,
 	injectLog,
 	isEncryptionOn,
@@ -67,6 +70,7 @@ export default class Encryption {
 		}
 
 		this.started = true;
+		initializeDecryptedMessageRenderer();
 
 		// Inject styles
 		inject("styles", "head", "append", this.components.styles);
@@ -119,6 +123,8 @@ export default class Encryption {
 		this.started = false;
 		this.bootstrapTimeouts.forEach((timeout) => clearTimeout(timeout));
 		this.bootstrapTimeouts = [];
+		cancelPendingDecryptions();
+		cleanupDecryptedMessageRenderer();
 
 		BdApi.Patcher.unpatchAll(store.state.config.name);
 

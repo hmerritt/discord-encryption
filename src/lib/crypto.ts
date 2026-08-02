@@ -1,6 +1,12 @@
-import $ from "jquery";
-
 import { getChannel } from "../state/actions";
+import {
+	getRenderedCiphertext,
+	isMessageRenderedFor,
+	renderDecryptedMessage,
+	restoreRenderedMessage,
+	setDecryptedMessageState
+} from "./decryptedMessageRenderer";
+import { getChannelId } from "./helpers";
 import { log } from "./log";
 
 export const PREFIX = "#!enc/";
@@ -141,25 +147,95 @@ export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
 
 export const isMessageEncrypted = (msg: string) => msg?.startsWith(PREFIX);
 
+type PendingDecryption = {
+	channelId: string;
+	ciphertext: string;
+	generation: number;
+	password: string;
+	token: symbol;
+};
+
+let pendingDecryptions = new WeakMap<HTMLElement, PendingDecryption>();
+let decryptionGeneration = 0;
+
+export const cancelPendingDecryptions = () => {
+	decryptionGeneration += 1;
+	pendingDecryptions = new WeakMap();
+};
+
+const canCommitDecryption = (element: HTMLElement, pending: PendingDecryption) => {
+	const current = pendingDecryptions.get(element);
+	const currentCiphertext =
+		getRenderedCiphertext(element) ?? element.textContent?.trim();
+
+	return (
+		current?.token === pending.token &&
+		pending.generation === decryptionGeneration &&
+		element.isConnected &&
+		getChannelId() === pending.channelId &&
+		getChannel(pending.channelId).password === pending.password &&
+		currentCiphertext === pending.ciphertext
+	);
+};
+
 export const decryptAllMessages = async () => {
-	let markup = $(`div[class*="messageContent"]`);
-	if (!markup || markup.length === 0) markup = $(`div[id*="message-content"]`);
+	let markup = document.querySelectorAll<HTMLElement>(`div[class*="messageContent"]`);
+	if (markup.length === 0) {
+		markup = document.querySelectorAll<HTMLElement>(`div[id*="message-content"]`);
+	}
 
-	$(markup).each(function () {
-		const message = $(this).text().trim();
-		if (!isMessageEncrypted(message)) return;
+	const channelId = getChannelId();
+	const password = getChannel(channelId).password;
+	const decryptions: Promise<void>[] = [];
 
-		decrypt(message.slice(PREFIX.length), getChannel().password)
+	for (const element of Array.from(markup)) {
+		const message =
+			getRenderedCiphertext(element) ?? element.textContent?.trim() ?? "";
+		if (!isMessageEncrypted(message)) continue;
+		if (isMessageRenderedFor(element, message, channelId, password)) continue;
+
+		const existing = pendingDecryptions.get(element);
+		if (
+			existing?.ciphertext === message &&
+			existing.channelId === channelId &&
+			existing.password === password
+		) {
+			continue;
+		}
+
+		restoreRenderedMessage(element);
+		setDecryptedMessageState(element, "pending");
+
+		const pending: PendingDecryption = {
+			channelId,
+			ciphertext: message,
+			generation: decryptionGeneration,
+			password,
+			token: Symbol("decryption")
+		};
+		pendingDecryptions.set(element, pending);
+
+		const task = decrypt(message.slice(PREFIX.length), password)
 			.then((decrypted) => {
-				if (!decrypted) throw "decryption failed";
-				$(this)
-					.html(decrypted)
-					.removeClass("not-decrypted")
-					.addClass("decrypted");
+				if (!decrypted) throw new Error("Decryption returned empty plaintext");
+				if (!canCommitDecryption(element, pending)) return;
+
+				renderDecryptedMessage(element, decrypted, message, channelId, password);
 			})
-			.catch((e) => {
-				log.error(`Error decrypting message`, e);
-				$(this).removeClass("decrypted").addClass("not-decrypted");
+			.catch((error) => {
+				if (!canCommitDecryption(element, pending)) return;
+
+				log.error(`Error decrypting message`, error);
+				setDecryptedMessageState(element, "not-decrypted");
+			})
+			.finally(() => {
+				if (pendingDecryptions.get(element)?.token === pending.token) {
+					pendingDecryptions.delete(element);
+				}
 			});
-	});
+
+		decryptions.push(task);
+	}
+
+	await Promise.all(decryptions);
 };

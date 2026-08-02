@@ -12,7 +12,13 @@ type BdApiPartial = {
 	Patcher: any;
 	Plugins: any;
 	React: any;
-	ReactDOM: any;
+	ReactDOM: {
+		createRoot: (container: Element | DocumentFragment) => {
+			render: (node: any) => void;
+			unmount: () => void;
+		};
+		[x: string]: any;
+	};
 	ReactUtils: any;
 	Themes: any;
 	UI: any;

@@ -121,13 +121,16 @@ export const styles = css`
 		background-color: rgb(67, 181, 129);
 	}
 
-	.decrypted {
+	div[class*="messageContent"].decrypted,
+	div[id*="message-content"].decrypted {
 		color: #43b581 !important;
 	}
-	.decrypted a {
+	div[class*="messageContent"].decrypted a,
+	div[id*="message-content"].decrypted a {
 		color: #1c9c6d !important;
 	}
-	.not-decrypted {
+	div[class*="messageContent"].not-decrypted,
+	div[id*="message-content"].not-decrypted {
 		color: #ff2949 !important;
 	}
 
